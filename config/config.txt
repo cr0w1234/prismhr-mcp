@@ -1,0 +1,11 @@
+Include the following variables in the .env file:
+PRISMHR_USERNAME="..."
+PRISMHR_PASSWORD="..."
+PRISMHR_PEO_ID="..."
+PRISMHR_BASE_URL=https://salesdemoapi.prismhr.com/prismhr-api
+PRISMHR_CLIENT_ID=132
+
+# Server Configuration
+PORT=8080
+MCP_SERVER_URL=https://prismhr-mcp-server-82241824210.us-central1.run.app/mcp
+OPENAI_API_KEY=...
