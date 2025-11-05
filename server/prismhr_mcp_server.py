@@ -1,9 +1,11 @@
+# Returns full error message from PrismHR API
 import asyncio
 import logging
 import os
 from fastmcp import FastMCP 
 import json
 import urllib.request
+import urllib.error
 import urllib.parse
 from typing import Any, Dict, List, Optional
 from dotenv import load_dotenv
@@ -14,6 +16,47 @@ logging.basicConfig(format="[%(levelname)s]: %(message)s", level=logging.INFO)
 mcp = FastMCP("PrismHR MCP Server", stateless_http=True)
 
 load_dotenv(override=True)
+
+def handle_http_error(error: urllib.error.HTTPError, endpoint_name: str) -> Dict[str, Any]:
+    """
+    Handle HTTP errors from PrismHR API and return full error details
+    
+    Args:
+        error: The HTTPError exception from urllib
+        endpoint_name: Name of the endpoint for logging
+        
+    Returns:
+        Dictionary containing full error information from PrismHR API
+    """
+    try:
+        # Read the error response body (contains detailed error from PrismHR)
+        error_body = error.read().decode('utf-8')
+        logger.error(f"{endpoint_name} HTTP {error.code}: {error_body}")
+        
+        # Try to parse as JSON (PrismHR typically returns JSON error responses)
+        try:
+            error_result = json.loads(error_body)
+            # Return the full error response from PrismHR
+            return {
+                "error": f"HTTP {error.code}: {error.reason}",
+                "errorCode": error_result.get("errorCode", str(error.code)),
+                "errorMessage": error_result.get("errorMessage", error.reason),
+                "fullError": error_result  # Include full error response
+            }
+        except json.JSONDecodeError:
+            # If not JSON, return the raw error body
+            return {
+                "error": f"HTTP {error.code}: {error.reason}",
+                "errorMessage": error_body,
+                "rawError": error_body
+            }
+    except Exception as e:
+        # If we can't read the error body, fall back to basic error info
+        logger.error(f"{endpoint_name} error reading response: {e}")
+        return {
+            "error": f"HTTP {error.code}: {error.reason}",
+            "errorMessage": f"Failed to read error response: {e}"
+        }
 
 def authenticate_prismhr(username, password, peo_id, base_url="https://salesdemoapi.prismhr.com/prismhr-api"):
     """
@@ -225,6 +268,8 @@ def get_employee_list(client_id: str, status_class: Optional[str] = None, type_c
         
         return result
             
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get employee list")
     except Exception as e:
         logger.error(f"Get employee list failed: {e}")
         return {"error": f"Get employee list failed: {e}"}
@@ -281,6 +326,8 @@ def get_employee(client_id: str, employee_id: str, options: Optional[str] = None
         
         return result
             
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get employee")
     except Exception as e:
         logger.error(f"Get employee failed: {e}")
         return {"error": f"Get employee failed: {e}"}
@@ -353,6 +400,8 @@ def get_job_applicant_list(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get job applicant list")
     except Exception as e:
         logger.error(f"Get job applicant list failed: {e}")
         return {"error": f"Get job applicant list failed: {e}"}
@@ -404,6 +453,8 @@ def get_job_applicants(client_id: str, applicant_id: Optional[str] = None) -> Di
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get job applicants")
     except Exception as e:
         logger.error(f"Get job applicants failed: {e}")
         return {"error": f"Get job applicants failed: {e}"}
@@ -470,6 +521,8 @@ def get_benefit_enrollment_status(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get benefit enrollment status")
     except Exception as e:
         logger.error(f"Get benefit enrollment status failed: {e}")
         return {"error": f"Get benefit enrollment status failed: {e}"}
@@ -527,6 +580,8 @@ def get_401k_match_rules(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get 401k match rules failed")
     except Exception as e:
         logger.error(f"Get 401k match rules failed: {e}")
         return {"error": f"Get 401k match rules failed: {e}"}
@@ -589,6 +644,8 @@ def get_aca_offered_employees(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get ACA offered employees")
     except Exception as e:
         logger.error(f"Get ACA offered employees failed: {e}")
         return {"error": f"Get ACA offered employees failed: {e}"}
@@ -645,6 +702,8 @@ def get_absence_journal(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get absence journal")
     except Exception as e:
         logger.error(f"Get absence journal failed: {e}")
         return {"error": f"Get absence journal failed: {e}"}
@@ -715,6 +774,8 @@ def get_absence_journal_by_date(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get absence journal by date")
     except Exception as e:
         logger.error(f"Get absence journal by date failed: {e}")
         return {"error": f"Get absence journal by date failed: {e}"}
@@ -778,6 +839,8 @@ def get_active_benefit_plans(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get active benefit plans")
     except Exception as e:
         logger.error(f"Get active benefit plans failed: {e}")
         return {"error": f"Get active benefit plans failed: {e}"}
@@ -832,6 +895,8 @@ def get_available_benefit_plans(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get available benefit plans")
     except Exception as e:
         logger.error(f"Get available benefit plans failed: {e}")
         return {"error": f"Get available benefit plans failed: {e}"}
@@ -886,6 +951,8 @@ def get_benefit_adjustments(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get benefit adjustments")
     except Exception as e:
         logger.error(f"Get benefit adjustments failed: {e}")
         return {"error": f"Get benefit adjustments failed: {e}"}
@@ -950,6 +1017,8 @@ def get_benefit_confirmation_data(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get benefit confirmation data")
     except Exception as e:
         logger.error(f"Get benefit confirmation data failed: {e}")
         return {"error": f"Get benefit confirmation data failed: {e}"}
@@ -1009,6 +1078,8 @@ def get_benefit_confirmation_list(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get benefit confirmation list")
     except Exception as e:
         logger.error(f"Get benefit confirmation list failed: {e}")
         return {"error": f"Get benefit confirmation list failed: {e}"}
@@ -1049,6 +1120,8 @@ def get_benefit_plan_list() -> Dict[str, Any]:
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get benefit plan list")
     except Exception as e:
         logger.error(f"Get benefit plan list failed: {e}")
         return {"error": f"Get benefit plan list failed: {e}"}
@@ -1108,6 +1181,8 @@ def get_benefit_plans(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get benefit plans")
     except Exception as e:
         logger.error(f"Get benefit plans failed: {e}")
         return {"error": f"Get benefit plans failed: {e}"}
@@ -1174,6 +1249,8 @@ def get_benefit_rule(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get benefit rule")
     except Exception as e:
         logger.error(f"Get benefit rule failed: {e}")
         return {"error": f"Get benefit rule failed: {e}"}
@@ -1248,6 +1325,8 @@ def get_benefit_workflow_grid(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get benefit workflow grid")
     except Exception as e:
         logger.error(f"Get benefit workflow grid failed: {e}")
         return {"error": f"Get benefit workflow grid failed: {e}"}
@@ -1302,6 +1381,8 @@ def get_benefits_enrollment_trace(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get benefits enrollment trace")
     except Exception as e:
         logger.error(f"Get benefits enrollment trace failed: {e}")
         return {"error": f"Get benefits enrollment trace failed: {e}"}
@@ -1359,6 +1440,8 @@ def get_client_benefit_plan_setup_details(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get client benefit plan setup details")
     except Exception as e:
         logger.error(f"Get client benefit plan setup details failed: {e}")
         return {"error": f"Get client benefit plan setup details failed: {e}"}
@@ -1408,6 +1491,8 @@ def get_client_benefit_plans(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get client benefit plans")
     except Exception as e:
         logger.error(f"Get client benefit plans failed: {e}")
         return {"error": f"Get client benefit plans failed: {e}"}
@@ -1448,6 +1533,8 @@ def get_cobra_codes() -> Dict[str, Any]:
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get cobra codes")
     except Exception as e:
         logger.error(f"Get cobra codes failed: {e}")
         return {"error": f"Get cobra codes failed: {e}"}
@@ -1499,6 +1586,8 @@ def get_cobra_employee(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get cobra employee")
     except Exception as e:
         logger.error(f"Get cobra employee failed: {e}")
         return {"error": f"Get cobra employee failed: {e}"}
@@ -1562,6 +1651,8 @@ def get_dependents(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get dependents")
     except Exception as e:
         logger.error(f"Get dependents failed: {e}")
         return {"error": f"Get dependents failed: {e}"}
@@ -1620,6 +1711,8 @@ def get_disability_plan_enrollment_details(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get disability plan enrollment details")
     except Exception as e:
         logger.error(f"Get disability plan enrollment details failed: {e}")
         return {"error": f"Get disability plan enrollment details failed: {e}"}
@@ -1679,6 +1772,8 @@ def get_eligible_flex_spending_plans(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get eligible flex spending plans")
     except Exception as e:
         logger.error(f"Get eligible flex spending plans failed: {e}")
         return {"error": f"Get eligible flex spending plans failed: {e}"}
@@ -1728,6 +1823,8 @@ def get_eligible_zip_codes(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get eligible zip codes")
     except Exception as e:
         logger.error(f"Get eligible zip codes failed: {e}")
         return {"error": f"Get eligible zip codes failed: {e}"}
@@ -1795,6 +1892,8 @@ def get_employee_premium(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get employee premium")
     except Exception as e:
         logger.error(f"Get employee premium failed: {e}")
         return {"error": f"Get employee premium failed: {e}"}
@@ -1855,6 +1954,8 @@ def get_employee_retirement_summary(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get employee retirement summary")
     except Exception as e:
         logger.error(f"Get employee retirement summary failed: {e}")
         return {"error": f"Get employee retirement summary failed: {e}"}
@@ -1912,6 +2013,8 @@ def get_enroll_input_list(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get enroll input list")
     except Exception as e:
         logger.error(f"Get enroll input list failed: {e}")
         return {"error": f"Get enroll input list failed: {e}"}
@@ -1971,6 +2074,8 @@ def get_enrollment_plan_details(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get enrollment plan details")
     except Exception as e:
         logger.error(f"Get enrollment plan details failed: {e}")
         return {"error": f"Get enrollment plan details failed: {e}"}
@@ -2038,6 +2143,8 @@ def get_fsa_reimbursements(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get FSA reimbursements")
     except Exception as e:
         logger.error(f"Get FSA reimbursements failed: {e}")
         return {"error": f"Get FSA reimbursements failed: {e}"}
@@ -2094,6 +2201,8 @@ def get_flex_plans(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get flex plans")
     except Exception as e:
         logger.error(f"Get flex plans failed: {e}")
         return {"error": f"Get flex plans failed: {e}"}
@@ -2143,6 +2252,8 @@ def get_group_benefit_plan(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get group benefit plan")
     except Exception as e:
         logger.error(f"Get group benefit plan failed: {e}")
         return {"error": f"Get group benefit plan failed: {e}"}
@@ -2213,6 +2324,8 @@ def get_group_benefit_rates(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get group benefit rates")
     except Exception as e:
         logger.error(f"Get group benefit rates failed: {e}")
         return {"error": f"Get group benefit rates failed: {e}"}
@@ -2265,6 +2378,8 @@ def get_group_benefit_types(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get group benefit types")
     except Exception as e:
         logger.error(f"Get group benefit types failed: {e}")
         return {"error": f"Get group benefit types failed: {e}"}
@@ -2319,6 +2434,8 @@ def get_life_event_code_details(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get life event code details")
     except Exception as e:
         logger.error(f"Get life event code details failed: {e}")
         return {"error": f"Get life event code details failed: {e}"}
@@ -2375,6 +2492,8 @@ def get_monthly_aca_info(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get monthly ACA info")
     except Exception as e:
         logger.error(f"Get monthly ACA info failed: {e}")
         return {"error": f"Get monthly ACA info failed: {e}"}
@@ -2441,6 +2560,8 @@ def get_pto_requests_list(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get PTO requests list")
     except Exception as e:
         logger.error(f"Get PTO requests list failed: {e}")
         return {"error": f"Get PTO requests list failed: {e}"}
@@ -2495,6 +2616,8 @@ def get_paid_time_off(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get paid time off")
     except Exception as e:
         logger.error(f"Get paid time off failed: {e}")
         return {"error": f"Get paid time off failed: {e}"}
@@ -2544,6 +2667,8 @@ def get_paid_time_off_plans(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get paid time off plans")
     except Exception as e:
         logger.error(f"Get paid time off plans failed: {e}")
         return {"error": f"Get paid time off plans failed: {e}"}
@@ -2604,6 +2729,8 @@ def get_plan_year_info(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get plan year info")
     except Exception as e:
         logger.error(f"Get plan year info failed: {e}")
         return {"error": f"Get plan year info failed: {e}"}
@@ -2660,6 +2787,8 @@ def get_pto_absence_codes(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get PTO absence codes")
     except Exception as e:
         logger.error(f"Get PTO absence codes failed: {e}")
         return {"error": f"Get PTO absence codes failed: {e}"}
@@ -2709,6 +2838,8 @@ def get_pto_auto_enroll_rules(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get PTO auto enroll rules")
     except Exception as e:
         logger.error(f"Get PTO auto enroll rules failed: {e}")
         return {"error": f"Get PTO auto enroll rules failed: {e}"}
@@ -2758,6 +2889,8 @@ def get_pto_classes(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get PTO classes")
     except Exception as e:
         logger.error(f"Get PTO classes failed: {e}")
         return {"error": f"Get PTO classes failed: {e}"}
@@ -2812,6 +2945,8 @@ def get_pto_plan_details(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get PTO plan details")
     except Exception as e:
         logger.error(f"Get PTO plan details failed: {e}")
         return {"error": f"Get PTO plan details failed: {e}"}
@@ -2866,6 +3001,8 @@ def get_pto_register_types(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get PTO register types")
     except Exception as e:
         logger.error(f"Get PTO register types failed: {e}")
         return {"error": f"Get PTO register types failed: {e}"}
@@ -2922,6 +3059,8 @@ def get_retirement_loans(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get retirement loans")
     except Exception as e:
         logger.error(f"Get retirement loans failed: {e}")
         return {"error": f"Get retirement loans failed: {e}"}
@@ -2985,6 +3124,8 @@ def get_retirement_plan(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get retirement plan")
     except Exception as e:
         logger.error(f"Get retirement plan failed: {e}")
         return {"error": f"Get retirement plan failed: {e}"}
@@ -3047,6 +3188,8 @@ def get_section125_plans(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get section 125 plans")
     except Exception as e:
         logger.error(f"Get section 125 plans failed: {e}")
         return {"error": f"Get section 125 plans failed: {e}"}
@@ -3126,6 +3269,8 @@ def get_retirement_census_export(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get retirement census export")
     except Exception as e:
         logger.error(f"Get retirement census export failed: {e}")
         return {"error": f"Get retirement census export failed: {e}"}
@@ -3184,6 +3329,8 @@ def get_aca_large_employer(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get ACA large employer")
     except Exception as e:
         logger.error(f"Get ACA large employer failed: {e}")
         return {"error": f"Get ACA large employer failed: {e}"}
@@ -3249,6 +3396,8 @@ def get_active_employee_count_by_entity(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get active employee count by entity")
     except Exception as e:
         logger.error(f"Get active employee count by entity failed: {e}")
         return {"error": f"Get active employee count by entity failed: {e}"}
@@ -3298,6 +3447,8 @@ def get_all_prism_client_contacts(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get all Prism client contacts")
     except Exception as e:
         logger.error(f"Get all Prism client contacts failed: {e}")
         return {"error": f"Get all Prism client contacts failed: {e}"}
@@ -3347,6 +3498,8 @@ def get_backup_assignments(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get backup assignments")
     except Exception as e:
         logger.error(f"Get backup assignments failed: {e}")
         return {"error": f"Get backup assignments failed: {e}"}
@@ -3401,6 +3554,8 @@ def get_benefit_group(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get benefit group")
     except Exception as e:
         logger.error(f"Get benefit group failed: {e}")
         return {"error": f"Get benefit group failed: {e}"}
@@ -3467,6 +3622,8 @@ def get_bill_pending(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get bill pending")
     except Exception as e:
         logger.error(f"Get bill pending failed: {e}")
         return {"error": f"Get bill pending failed: {e}"}
@@ -3531,6 +3688,8 @@ def get_bundled_billing_rule(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get bundled billing rule")
     except Exception as e:
         logger.error(f"Get bundled billing rule failed: {e}")
         return {"error": f"Get bundled billing rule failed: {e}"}
@@ -3580,6 +3739,8 @@ def get_client_billing_bank_account(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get client billing bank account")
     except Exception as e:
         logger.error(f"Get client billing bank account failed: {e}")
         return {"error": f"Get client billing bank account failed: {e}"}
@@ -3647,6 +3808,8 @@ def get_client_codes(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get client codes")
     except Exception as e:
         logger.error(f"Get client codes failed: {e}")
         return {"error": f"Get client codes failed: {e}"}
@@ -3709,6 +3872,8 @@ def get_client_events(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get client events")
     except Exception as e:
         logger.error(f"Get client events failed: {e}")
         return {"error": f"Get client events failed: {e}"}
@@ -3761,6 +3926,8 @@ def get_client_list(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get client list")
     except Exception as e:
         logger.error(f"Get client list failed: {e}")
         return {"error": f"Get client list failed: {e}"}
@@ -3817,6 +3984,8 @@ def get_client_location_details(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get client location details")
     except Exception as e:
         logger.error(f"Get client location details failed: {e}")
         return {"error": f"Get client location details failed: {e}"}
@@ -3866,6 +4035,8 @@ def get_client_master(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get client master")
     except Exception as e:
         logger.error(f"Get client master failed: {e}")
         return {"error": f"Get client master failed: {e}"}
@@ -3915,6 +4086,8 @@ def get_client_ownership(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get client ownership")
     except Exception as e:
         logger.error(f"Get client ownership failed: {e}")
         return {"error": f"Get client ownership failed: {e}"}
@@ -3977,6 +4150,8 @@ def get_doc_expirations(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get doc expirations")
     except Exception as e:
         logger.error(f"Get doc expirations failed: {e}")
         return {"error": f"Get doc expirations failed: {e}"}
@@ -4039,6 +4214,8 @@ def get_employee_list_by_entity(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get employee list by entity")
     except Exception as e:
         logger.error(f"Get employee list by entity failed: {e}")
         return {"error": f"Get employee list by entity failed: {e}"}
@@ -4095,6 +4272,8 @@ def get_employees_in_pay_group(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get employees in pay group")
     except Exception as e:
         logger.error(f"Get employees in pay group failed: {e}")
         return {"error": f"Get employees in pay group failed: {e}"}
@@ -4149,6 +4328,8 @@ def get_gl_cutback_check_post(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get GL cutback check post")
     except Exception as e:
         logger.error(f"Get GL cutback check post failed: {e}")
         return {"error": f"Get GL cutback check post failed: {e}"}
@@ -4198,6 +4379,8 @@ def get_gl_data(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get GL data")
     except Exception as e:
         logger.error(f"Get GL data failed: {e}")
         return {"error": f"Get GL data failed: {e}"}
@@ -4252,6 +4435,8 @@ def get_gl_invoice_post(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get GL invoice post")
     except Exception as e:
         logger.error(f"Get GL invoice post failed: {e}")
         return {"error": f"Get GL invoice post failed: {e}"}
@@ -4306,6 +4491,8 @@ def get_gl_journal_post(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get GL journal post")
     except Exception as e:
         logger.error(f"Get GL journal post failed: {e}")
         return {"error": f"Get GL journal post failed: {e}"}
@@ -4357,6 +4544,8 @@ def get_geo_locations(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get geo locations")
     except Exception as e:
         logger.error(f"Get geo locations failed: {e}")
         return {"error": f"Get geo locations failed: {e}"}
@@ -4411,6 +4600,8 @@ def get_labor_allocations(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get labor allocations")
     except Exception as e:
         logger.error(f"Get labor allocations failed: {e}")
         return {"error": f"Get labor allocations failed: {e}"}
@@ -4465,6 +4656,8 @@ def get_labor_union_details(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get labor union details")
     except Exception as e:
         logger.error(f"Get labor union details failed: {e}")
         return {"error": f"Get labor union details failed: {e}"}
@@ -4527,6 +4720,8 @@ def get_message_list(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get message list")
     except Exception as e:
         logger.error(f"Get message list failed: {e}")
         return {"error": f"Get message list failed: {e}"}
@@ -4581,6 +4776,8 @@ def get_messages(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get messages")
     except Exception as e:
         logger.error(f"Get messages failed: {e}")
         return {"error": f"Get messages failed: {e}"}
@@ -4642,6 +4839,8 @@ def get_osha_300a_stats(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get OSHA 300A stats")
     except Exception as e:
         logger.error(f"Get OSHA 300A stats failed: {e}")
         return {"error": f"Get OSHA 300A stats failed: {e}"}
@@ -4691,6 +4890,8 @@ def get_pay_day_rules(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get pay day rules")
     except Exception as e:
         logger.error(f"Get pay day rules failed: {e}")
         return {"error": f"Get pay day rules failed: {e}"}
@@ -4745,6 +4946,8 @@ def get_pay_group_details(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get pay group details")
     except Exception as e:
         logger.error(f"Get pay group details failed: {e}")
         return {"error": f"Get pay group details failed: {e}"}
@@ -4794,6 +4997,8 @@ def get_payroll_schedule(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get payroll schedule")
     except Exception as e:
         logger.error(f"Get payroll schedule failed: {e}")
         return {"error": f"Get payroll schedule failed: {e}"}
@@ -4848,6 +5053,8 @@ def get_prism_client_contact(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get prism client contact")
     except Exception as e:
         logger.error(f"Get prism client contact failed: {e}")
         return {"error": f"Get prism client contact failed: {e}"}
@@ -4908,6 +5115,8 @@ def get_retirement_plan_list(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get retirement plan list")
     except Exception as e:
         logger.error(f"Get retirement plan list failed: {e}")
         return {"error": f"Get retirement plan list failed: {e}"}
@@ -4970,6 +5179,8 @@ def get_suta_billing_rates(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get SUTA billing rates")
     except Exception as e:
         logger.error(f"Get SUTA billing rates failed: {e}")
         return {"error": f"Get SUTA billing rates failed: {e}"}
@@ -5044,6 +5255,8 @@ def get_suta_rates(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get SUTA rates")
     except Exception as e:
         logger.error(f"Get SUTA rates failed: {e}")
         return {"error": f"Get SUTA rates failed: {e}"}
@@ -5106,6 +5319,8 @@ def get_unbundled_billing_rules(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get unbundled billing rules")
     except Exception as e:
         logger.error(f"Get unbundled billing rules failed: {e}")
         return {"error": f"Get unbundled billing rules failed: {e}"}
@@ -5164,6 +5379,8 @@ def get_wc_accrual_modifiers(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get WC accrual modifiers")
     except Exception as e:
         logger.error(f"Get WC accrual modifiers failed: {e}")
         return {"error": f"Get WC accrual modifiers failed: {e}"}
@@ -5229,6 +5446,8 @@ def get_wc_billing_modifiers(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get WC billing modifiers")
     except Exception as e:
         logger.error(f"Get WC billing modifiers failed: {e}")
         return {"error": f"Get WC billing modifiers failed: {e}"}
@@ -5283,6 +5502,8 @@ def get_client_location_details_v2(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get client location details V2")
     except Exception as e:
         logger.error(f"Get client location details V2 failed: {e}")
         return {"error": f"Get client location details V2 failed: {e}"}
@@ -5358,6 +5579,8 @@ def get_suta_billing_rates_v2(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get SUTA billing rates V2")
     except Exception as e:
         logger.error(f"Get SUTA billing rates V2 failed: {e}")
         return {"error": f"Get SUTA billing rates V2 failed: {e}"}
@@ -5422,6 +5645,8 @@ def get_billing_code(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get billing code")
     except Exception as e:
         logger.error(f"Get billing code failed: {e}")
         return {"error": f"Get billing code failed: {e}"}
@@ -5482,6 +5707,8 @@ def get_client_category_list(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get client category list")
     except Exception as e:
         logger.error(f"Get client category list failed: {e}")
         return {"error": f"Get client category list failed: {e}"}
@@ -5527,6 +5754,8 @@ def get_contact_type_list() -> Dict[str, Any]:
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get contact type list")
     except Exception as e:
         logger.error(f"Get contact type list failed: {e}")
         return {"error": f"Get contact type list failed: {e}"}
@@ -5581,6 +5810,8 @@ def get_course_codes_list(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get course codes list")
     except Exception as e:
         logger.error(f"Get course codes list failed: {e}")
         return {"error": f"Get course codes list failed: {e}"}
@@ -5630,6 +5861,8 @@ def get_deduction_code_details(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get deduction code details")
     except Exception as e:
         logger.error(f"Get deduction code details failed: {e}")
         return {"error": f"Get deduction code details failed: {e}"}
@@ -5684,6 +5917,8 @@ def get_department_code(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get department code")
     except Exception as e:
         logger.error(f"Get department code failed: {e}")
         return {"error": f"Get department code failed: {e}"}
@@ -5738,6 +5973,8 @@ def get_division_code(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get division code")
     except Exception as e:
         logger.error(f"Get division code failed: {e}")
         return {"error": f"Get division code failed: {e}"}
@@ -5794,6 +6031,8 @@ def get_eeo_codes(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get EEO codes")
     except Exception as e:
         logger.error(f"Get EEO codes failed: {e}")
         return {"error": f"Get EEO codes failed: {e}"}
@@ -5843,6 +6082,8 @@ def get_event_codes(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get event codes")
     except Exception as e:
         logger.error(f"Get event codes failed: {e}")
         return {"error": f"Get event codes failed: {e}"}
@@ -5895,6 +6136,8 @@ def get_holiday_code_list(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get holiday code list")
     except Exception as e:
         logger.error(f"Get holiday code list failed: {e}")
         return {"error": f"Get holiday code list failed: {e}"}
@@ -5955,6 +6198,8 @@ def get_naics_code_list(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get NAICS code list")
     except Exception as e:
         logger.error(f"Get NAICS code list failed: {e}")
         return {"error": f"Get NAICS code list failed: {e}"}
@@ -6009,6 +6254,8 @@ def get_pay_grades(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get pay grades")
     except Exception as e:
         logger.error(f"Get pay grades failed: {e}")
         return {"error": f"Get pay grades failed: {e}"}
@@ -6060,6 +6307,8 @@ def get_paycode_details(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get paycode details")
     except Exception as e:
         logger.error(f"Get paycode details failed: {e}")
         return {"error": f"Get paycode details failed: {e}"}
@@ -6112,6 +6361,8 @@ def get_position_classifications(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get position classifications")
     except Exception as e:
         logger.error(f"Get position classifications failed: {e}")
         return {"error": f"Get position classifications failed: {e}"}
@@ -6166,6 +6417,8 @@ def get_position_code(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get position code")
     except Exception as e:
         logger.error(f"Get position code failed: {e}")
         return {"error": f"Get position code failed: {e}"}
@@ -6220,6 +6473,8 @@ def get_project_code(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get project code")
     except Exception as e:
         logger.error(f"Get project code failed: {e}")
         return {"error": f"Get project code failed: {e}"}
@@ -6278,6 +6533,8 @@ def get_project_phase(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get project phase")
     except Exception as e:
         logger.error(f"Get project phase failed: {e}")
         return {"error": f"Get project phase failed: {e}"}
@@ -6334,6 +6591,8 @@ def get_rating_code(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get rating code")
     except Exception as e:
         logger.error(f"Get rating code failed: {e}")
         return {"error": f"Get rating code failed: {e}"}
@@ -6388,6 +6647,8 @@ def get_shift_code(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get shift code")
     except Exception as e:
         logger.error(f"Get shift code failed: {e}")
         return {"error": f"Get shift code failed: {e}"}
@@ -6442,6 +6703,8 @@ def get_skill_code(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get skill code")
     except Exception as e:
         logger.error(f"Get skill code failed: {e}")
         return {"error": f"Get skill code failed: {e}"}
@@ -6502,6 +6765,8 @@ def get_user_defined_fields(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get user defined fields")
     except Exception as e:
         logger.error(f"Get user defined fields failed: {e}")
         return {"error": f"Get user defined fields failed: {e}"}
@@ -6561,6 +6826,8 @@ def get_deduction_arrears(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get deduction arrears")
     except Exception as e:
         logger.error(f"Get deduction arrears failed: {e}")
         return {"error": f"Get deduction arrears failed: {e}"}
@@ -6622,6 +6889,8 @@ def get_deductions(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get deductions")
     except Exception as e:
         logger.error(f"Get deductions failed: {e}")
         return {"error": f"Get deductions failed: {e}"}
@@ -6681,6 +6950,8 @@ def get_employee_loans(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get employee loans")
     except Exception as e:
         logger.error(f"Get employee loans failed: {e}")
         return {"error": f"Get employee loans failed: {e}"}
@@ -6744,6 +7015,8 @@ def get_garnishment_details(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get garnishment details")
     except Exception as e:
         logger.error(f"Get garnishment details failed: {e}")
         return {"error": f"Get garnishment details failed: {e}"}
@@ -6803,6 +7076,8 @@ def get_garnishment_payment_history(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get garnishment payment history")
     except Exception as e:
         logger.error(f"Get garnishment payment history failed: {e}")
         return {"error": f"Get garnishment payment history failed: {e}"}
@@ -6857,6 +7132,8 @@ def get_voluntary_recurring_deductions(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get voluntary recurring deductions")
     except Exception as e:
         logger.error(f"Get voluntary recurring deductions failed: {e}")
         return {"error": f"Get voluntary recurring deductions failed: {e}"}
@@ -6912,6 +7189,8 @@ def get_document_types(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get document types")
     except Exception as e:
         logger.error(f"Get document types failed: {e}")
         return {"error": f"Get document types failed: {e}"}
@@ -6972,6 +7251,8 @@ def get_ruleset(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get ruleset")
     except Exception as e:
         logger.error(f"Get ruleset failed: {e}")
         return {"error": f"Get ruleset failed: {e}"}
@@ -7026,6 +7307,8 @@ def check_for_garnishments(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Check for garnishments")
     except Exception as e:
         logger.error(f"Check for garnishments failed: {e}")
         return {"error": f"Check for garnishments failed: {e}"}
@@ -7085,6 +7368,8 @@ def download_1095c(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Download 1095C")
     except Exception as e:
         logger.error(f"Download 1095C failed: {e}")
         return {"error": f"Download 1095C failed: {e}"}
@@ -7144,6 +7429,8 @@ def download_w2(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Download W2")
     except Exception as e:
         logger.error(f"Download W2 failed: {e}")
         return {"error": f"Download W2 failed: {e}"}
@@ -7200,6 +7487,8 @@ def get_1095c_years(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get 1095C years")
     except Exception as e:
         logger.error(f"Get 1095C years failed: {e}")
         return {"error": f"Get 1095C years failed: {e}"}
@@ -7254,6 +7543,8 @@ def get_1099_years(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get 1099 years")
     except Exception as e:
         logger.error(f"Get 1099 years failed: {e}")
         return {"error": f"Get 1099 years failed: {e}"}
@@ -7308,6 +7599,8 @@ def get_ach_deductions(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get ACH deductions")
     except Exception as e:
         logger.error(f"Get ACH deductions failed: {e}")
         return {"error": f"Get ACH deductions failed: {e}"}
@@ -7362,6 +7655,8 @@ def get_address_info(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get address info")
     except Exception as e:
         logger.error(f"Get address info failed: {e}")
         return {"error": f"Get address info failed: {e}"}
@@ -7418,6 +7713,8 @@ def get_employee_events(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get employee events")
     except Exception as e:
         logger.error(f"Get employee events failed: {e}")
         return {"error": f"Get employee events failed: {e}"}
@@ -7469,6 +7766,8 @@ def get_employee_ssn_list(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get employee SSN list")
     except Exception as e:
         logger.error(f"Get employee SSN list failed: {e}")
         return {"error": f"Get employee SSN list failed: {e}"}
@@ -7509,6 +7808,8 @@ def get_employees_ready_for_everify() -> Dict[str, Any]:
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get employees ready for everify")
     except Exception as e:
         logger.error(f"Get employees ready for everify failed: {e}")
         return {"error": f"Get employees ready for everify failed: {e}"}
@@ -7563,6 +7864,8 @@ def get_employers_info(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get employers info")
     except Exception as e:
         logger.error(f"Get employers info failed: {e}")
         return {"error": f"Get employers info failed: {e}"}
@@ -7619,6 +7922,8 @@ def get_everify_status(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get everify status")
     except Exception as e:
         logger.error(f"Get everify status failed: {e}")
         return {"error": f"Get everify status failed: {e}"}
@@ -7670,6 +7975,8 @@ def get_future_ee_change(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get future ee change")
     except Exception as e:
         logger.error(f"Get future ee change failed: {e}")
         return {"error": f"Get future ee change failed: {e}"}
@@ -7724,6 +8031,8 @@ def get_garnishment_employee(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get garnishment employee")
     except Exception as e:
         logger.error(f"Get garnishment employee failed: {e}")
         return {"error": f"Get garnishment employee failed: {e}"}
@@ -7784,6 +8093,8 @@ def get_history(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get history")
     except Exception as e:
         logger.error(f"Get history failed: {e}")
         return {"error": f"Get history failed: {e}"}
@@ -7843,6 +8154,8 @@ def get_i9_data(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get I9 data")
     except Exception as e:
         logger.error(f"Get I9 data failed: {e}")
         return {"error": f"Get I9 data failed: {e}"}
@@ -7899,6 +8212,8 @@ def get_leave_requests(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get leave requests")
     except Exception as e:
         logger.error(f"Get leave requests failed: {e}")
         return {"error": f"Get leave requests failed: {e}"}
@@ -7953,6 +8268,8 @@ def get_life_event(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get life event")
     except Exception as e:
         logger.error(f"Get life event failed: {e}")
         return {"error": f"Get life event failed: {e}"}
@@ -8007,6 +8324,8 @@ def get_osha(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get OSHA")
     except Exception as e:
         logger.error(f"Get OSHA failed: {e}")
         return {"error": f"Get OSHA failed: {e}"}
@@ -8061,6 +8380,8 @@ def get_pay_card_employees(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get pay card employees")
     except Exception as e:
         logger.error(f"Get pay card employees failed: {e}")
         return {"error": f"Get pay card employees failed: {e}"}
@@ -8115,6 +8436,8 @@ def get_pay_rate_history(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get pay rate history")
     except Exception as e:
         logger.error(f"Get pay rate history failed: {e}")
         return {"error": f"Get pay rate history failed: {e}"}
@@ -8177,6 +8500,8 @@ def get_pending_approval(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get pending approval")
     except Exception as e:
         logger.error(f"Get pending approval failed: {e}")
         return {"error": f"Get pending approval failed: {e}"}
@@ -8231,6 +8556,8 @@ def get_position_rate(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get position rate")
     except Exception as e:
         logger.error(f"Get position rate failed: {e}")
         return {"error": f"Get position rate failed: {e}"}
@@ -8285,6 +8612,8 @@ def get_scheduled_deductions(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get scheduled deductions")
     except Exception as e:
         logger.error(f"Get scheduled deductions failed: {e}")
         return {"error": f"Get scheduled deductions failed: {e}"}
@@ -8339,6 +8668,8 @@ def get_status_history_for_adjustment(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get status history for adjustment")
     except Exception as e:
         logger.error(f"Get status history for adjustment failed: {e}")
         return {"error": f"Get status history for adjustment failed: {e}"}
@@ -8393,6 +8724,8 @@ def get_termination_date_range(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get termination date range")
     except Exception as e:
         logger.error(f"Get termination date range failed: {e}")
         return {"error": f"Get termination date range failed: {e}"}
@@ -8449,6 +8782,8 @@ def get_w2_years(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get W2 years")
     except Exception as e:
         logger.error(f"Get W2 years failed: {e}")
         return {"error": f"Get W2 years failed: {e}"}
@@ -8509,6 +8844,8 @@ def reprint_1099(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Reprint 1099")
     except Exception as e:
         logger.error(f"Reprint 1099 failed: {e}")
         return {"error": f"Reprint 1099 failed: {e}"}
@@ -8566,6 +8903,8 @@ def reprint_w2c(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Reprint W2C")
     except Exception as e:
         logger.error(f"Reprint W2C failed: {e}")
         return {"error": f"Reprint W2C failed: {e}"}
@@ -8622,6 +8961,8 @@ def get_bulk_outstanding_invoices(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get bulk outstanding invoices")
     except Exception as e:
         logger.error(f"Get bulk outstanding invoices failed: {e}")
         return {"error": f"Get bulk outstanding invoices failed: {e}"}
@@ -8673,6 +9014,8 @@ def get_client_accounting_template(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get client accounting template")
     except Exception as e:
         logger.error(f"Get client accounting template failed: {e}")
         return {"error": f"Get client accounting template failed: {e}"}
@@ -8751,6 +9094,8 @@ def get_client_gl_data(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get client GL data")
     except Exception as e:
         logger.error(f"Get client GL data failed: {e}")
         return {"error": f"Get client GL data failed: {e}"}
@@ -8803,6 +9148,8 @@ def get_gl_codes(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get GL codes")
     except Exception as e:
         logger.error(f"Get GL codes failed: {e}")
         return {"error": f"Get GL codes failed: {e}"}
@@ -8914,6 +9261,8 @@ def get_gl_detail_download(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get GL detail download")
     except Exception as e:
         logger.error(f"Get GL detail download failed: {e}")
         return {"error": f"Get GL detail download failed: {e}"}
@@ -8973,6 +9322,8 @@ def get_gl_invoice_detail(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get GL invoice detail")
     except Exception as e:
         logger.error(f"Get GL invoice detail failed: {e}")
         return {"error": f"Get GL invoice detail failed: {e}"}
@@ -9036,6 +9387,8 @@ def get_gl_setup(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get GL setup")
     except Exception as e:
         logger.error(f"Get GL setup failed: {e}")
         return {"error": f"Get GL setup failed: {e}"}
@@ -9094,6 +9447,8 @@ def get_outstanding_invoices(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get outstanding invoices")
     except Exception as e:
         logger.error(f"Get outstanding invoices failed: {e}")
         return {"error": f"Get outstanding invoices failed: {e}"}
@@ -9162,6 +9517,8 @@ def get_pending_cash_receipts(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get pending cash receipts")
     except Exception as e:
         logger.error(f"Get pending cash receipts failed: {e}")
         return {"error": f"Get pending cash receipts failed: {e}"}
@@ -9234,6 +9591,8 @@ def get_client_gl_data_v2(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get client GL data v2")
     except Exception as e:
         logger.error(f"Get client GL data v2 failed: {e}")
         return {"error": f"Get client GL data v2 failed: {e}"}
@@ -9290,6 +9649,8 @@ def get_assigned_pending_approvals(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get assigned pending approvals")
     except Exception as e:
         logger.error(f"Get assigned pending approvals failed: {e}")
         return {"error": f"Get assigned pending approvals failed: {e}"}
@@ -9354,6 +9715,8 @@ def get_onboard_tasks(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get onboard tasks")
     except Exception as e:
         logger.error(f"Get onboard tasks failed: {e}")
         return {"error": f"Get onboard tasks failed: {e}"}
@@ -9413,6 +9776,8 @@ def get_staffing_placement(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get staffing placement")
     except Exception as e:
         logger.error(f"Get staffing placement failed: {e}")
         return {"error": f"Get staffing placement failed: {e}"}
@@ -9477,6 +9842,8 @@ def get_staffing_placement_list(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get staffing placement list")
     except Exception as e:
         logger.error(f"Get staffing placement list failed: {e}")
         return {"error": f"Get staffing placement list failed: {e}"}
@@ -9528,6 +9895,8 @@ def check_permissions_request_status(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Check permissions request status")
     except Exception as e:
         logger.error(f"Check permissions request status failed: {e}")
         return {"error": f"Check permissions request status failed: {e}"}
@@ -9568,6 +9937,8 @@ def get_api_permissions() -> Dict[str, Any]:
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get API permissions")
     except Exception as e:
         logger.error(f"Get API permissions failed: {e}")
         return {"error": f"Get API permissions failed: {e}"}
@@ -9619,6 +9990,8 @@ def get_new_hire_questions(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get new hire questions")
     except Exception as e:
         logger.error(f"Get new hire questions failed: {e}")
         return {"error": f"Get new hire questions failed: {e}"}
@@ -9672,6 +10045,8 @@ def get_new_hire_required_fields(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get new hire required fields")
     except Exception as e:
         logger.error(f"Get new hire required fields failed: {e}")
         return {"error": f"Get new hire required fields failed: {e}"}
@@ -9726,6 +10101,8 @@ def check_initialization_status(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Check initialization status")
     except Exception as e:
         logger.error(f"Check initialization status failed: {e}")
         return {"error": f"Check initialization status failed: {e}"}
@@ -9785,6 +10162,8 @@ def get_approval_summary(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get approval summary")
     except Exception as e:
         logger.error(f"Get approval summary failed: {e}")
         return {"error": f"Get approval summary failed: {e}"}
@@ -9839,6 +10218,8 @@ def get_batch_info(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get batch info")
     except Exception as e:
         logger.error(f"Get batch info failed: {e}")
         return {"error": f"Get batch info failed: {e}"}
@@ -9904,6 +10285,8 @@ def get_batch_list_by_date(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get batch list by date")
     except Exception as e:
         logger.error(f"Get batch list by date failed: {e}")
         return {"error": f"Get batch list by date failed: {e}"}
@@ -9957,6 +10340,8 @@ def get_batch_list_for_approval(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get batch list for approval")
     except Exception as e:
         logger.error(f"Get batch list for approval failed: {e}")
         return {"error": f"Get batch list for approval failed: {e}"}
@@ -10008,6 +10393,8 @@ def get_batch_list_for_initialization(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get batch list for initialization")
     except Exception as e:
         logger.error(f"Get batch list for initialization failed: {e}")
         return {"error": f"Get batch list for initialization failed: {e}"}
@@ -10062,6 +10449,8 @@ def get_batch_payments(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get batch payments")
     except Exception as e:
         logger.error(f"Get batch payments failed: {e}")
         return {"error": f"Get batch payments failed: {e}"}
@@ -10116,6 +10505,8 @@ def get_batch_status(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get batch status")
     except Exception as e:
         logger.error(f"Get batch status failed: {e}")
         return {"error": f"Get batch status failed: {e}"}
@@ -10173,6 +10564,8 @@ def get_billing_code_totals_by_pay_group(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get billing code totals by pay group")
     except Exception as e:
         logger.error(f"Get billing code totals by pay group failed: {e}")
         return {"error": f"Get billing code totals by pay group failed: {e}"}
@@ -10229,6 +10622,8 @@ def get_billing_code_totals_for_batch(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get billing code totals for batch")
     except Exception as e:
         logger.error(f"Get billing code totals for batch failed: {e}")
         return {"error": f"Get billing code totals for batch failed: {e}"}
@@ -10283,6 +10678,8 @@ def get_billing_code_totals_with_costs(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get billing code totals with costs")
     except Exception as e:
         logger.error(f"Get billing code totals with costs failed: {e}")
         return {"error": f"Get billing code totals with costs failed: {e}"}
@@ -10337,6 +10734,8 @@ def get_billing_rule_unbundled(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get billing rule unbundled")
     except Exception as e:
         logger.error(f"Get billing rule unbundled failed: {e}")
         return {"error": f"Get billing rule unbundled failed: {e}"}
@@ -10411,6 +10810,8 @@ def get_billing_vouchers(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get billing vouchers")
     except Exception as e:
         logger.error(f"Get billing vouchers failed: {e}")
         return {"error": f"Get billing vouchers failed: {e}"}
@@ -10482,6 +10883,8 @@ def get_billing_vouchers_by_batch(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get billing vouchers by batch")
     except Exception as e:
         logger.error(f"Get billing vouchers by batch failed: {e}")
         return {"error": f"Get billing vouchers by batch failed: {e}"}
@@ -10552,6 +10955,8 @@ def get_bulk_year_to_date_values(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get bulk year to date values")
     except Exception as e:
         logger.error(f"Get bulk year to date values failed: {e}")
         return {"error": f"Get bulk year to date values failed: {e}"}
@@ -10606,6 +11011,8 @@ def get_clients_with_vouchers(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get clients with vouchers")
     except Exception as e:
         logger.error(f"Get clients with vouchers failed: {e}")
         return {"error": f"Get clients with vouchers failed: {e}"}
@@ -10672,6 +11079,8 @@ def get_employee_401k_contributions_by_date(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get employee 401K contributions by date")
     except Exception as e:
         logger.error(f"Get employee 401K contributions by date failed: {e}")
         return {"error": f"Get employee 401K contributions by date failed: {e}"}
@@ -10726,6 +11135,8 @@ def get_employee_for_batch(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get employee for batch")
     except Exception as e:
         logger.error(f"Get employee for batch failed: {e}")
         return {"error": f"Get employee for batch failed: {e}"}
@@ -10780,6 +11191,8 @@ def get_employee_override_rates(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get employee override rates")
     except Exception as e:
         logger.error(f"Get employee override rates failed: {e}")
         return {"error": f"Get employee override rates failed: {e}"}
@@ -10839,6 +11252,8 @@ def get_employee_payroll_summary(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get employee payroll summary")
     except Exception as e:
         logger.error(f"Get employee payroll summary failed: {e}")
         return {"error": f"Get employee payroll summary failed: {e}"}
@@ -10898,6 +11313,8 @@ def get_external_pto_balance(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get external PTO balance")
     except Exception as e:
         logger.error(f"Get external PTO balance failed: {e}")
         return {"error": f"Get external PTO balance failed: {e}"}
@@ -10966,6 +11383,8 @@ def get_manual_checks(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get manual checks")
     except Exception as e:
         logger.error(f"Get manual checks failed: {e}")
         return {"error": f"Get manual checks failed: {e}"}
@@ -11020,6 +11439,8 @@ def get_payroll_approval(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get payroll approval")
     except Exception as e:
         logger.error(f"Get payroll approval failed: {e}")
         return {"error": f"Get payroll approval failed: {e}"}
@@ -11074,6 +11495,8 @@ def get_payroll_batch_with_options(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get payroll batch with options")
     except Exception as e:
         logger.error(f"Get payroll batch with options failed: {e}")
         return {"error": f"Get payroll batch with options failed: {e}"}
@@ -11127,6 +11550,8 @@ def get_payroll_notes(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get payroll notes")
     except Exception as e:
         logger.error(f"Get payroll notes failed: {e}")
         return {"error": f"Get payroll notes failed: {e}"}
@@ -11178,6 +11603,8 @@ def get_payroll_schedule(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get payroll schedule")
     except Exception as e:
         logger.error(f"Get payroll schedule failed: {e}")
         return {"error": f"Get payroll schedule failed: {e}"}
@@ -11218,6 +11645,8 @@ def get_payroll_schedule_codes() -> Dict[str, Any]:
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get payroll schedule codes")
     except Exception as e:
         logger.error(f"Get payroll schedule codes failed: {e}")
         return {"error": f"Get payroll schedule codes failed: {e}"}
@@ -11290,6 +11719,8 @@ def get_payroll_summary(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get payroll summary")
     except Exception as e:
         logger.error(f"Get payroll summary failed: {e}")
         return {"error": f"Get payroll summary failed: {e}"}
@@ -11349,6 +11780,8 @@ def get_payroll_voucher_by_id(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get payroll voucher by id")
     except Exception as e:
         logger.error(f"Get payroll voucher by id failed: {e}")
         return {"error": f"Get payroll voucher by id failed: {e}"}
@@ -11418,6 +11851,8 @@ def get_payroll_voucher_for_batch(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get payroll voucher for batch")
     except Exception as e:
         logger.error(f"Get payroll voucher for batch failed: {e}")
         return {"error": f"Get payroll voucher for batch failed: {e}"}
@@ -11488,6 +11923,8 @@ def get_payroll_vouchers(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get payroll vouchers")
     except Exception as e:
         logger.error(f"Get payroll vouchers failed: {e}")
         return {"error": f"Get payroll vouchers failed: {e}"}
@@ -11561,6 +11998,8 @@ def get_payroll_vouchers_for_employee(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get payroll vouchers for employee")
     except Exception as e:
         logger.error(f"Get payroll vouchers for employee failed: {e}")
         return {"error": f"Get payroll vouchers for employee failed: {e}"}
@@ -11612,6 +12051,8 @@ def get_process_schedule(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get process schedule")
     except Exception as e:
         logger.error(f"Get process schedule failed: {e}")
         return {"error": f"Get process schedule failed: {e}"}
@@ -11652,6 +12093,8 @@ def get_process_schedule_codes() -> Dict[str, Any]:
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get process schedule codes")
     except Exception as e:
         logger.error(f"Get process schedule codes failed: {e}")
         return {"error": f"Get process schedule codes failed: {e}"}
@@ -11723,6 +12166,8 @@ def get_retirement_adj_voucher_list_by_date(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get retirement adj voucher list by date")
     except Exception as e:
         logger.error(f"Get retirement adj voucher list by date failed: {e}")
         return {"error": f"Get retirement adj voucher list by date failed: {e}"}
@@ -11777,6 +12222,8 @@ def get_scheduled_payments(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get scheduled payments")
     except Exception as e:
         logger.error(f"Get scheduled payments failed: {e}")
         return {"error": f"Get scheduled payments failed: {e}"}
@@ -11828,6 +12275,8 @@ def get_standard_hours(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get standard hours")
     except Exception as e:
         logger.error(f"Get standard hours failed: {e}")
         return {"error": f"Get standard hours failed: {e}"}
@@ -11887,6 +12336,8 @@ def get_year_to_date_values(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get year to date values")
     except Exception as e:
         logger.error(f"Get year to date values failed: {e}")
         return {"error": f"Get year to date values failed: {e}"}
@@ -11952,6 +12403,8 @@ def get_pay_group_schedule_report(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get pay group schedule report")
     except Exception as e:
         logger.error(f"Get pay group schedule report failed: {e}")
         return {"error": f"Get pay group schedule report failed: {e}"}
@@ -12011,6 +12464,8 @@ def reprint_check_stub(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Reprint check stub")
     except Exception as e:
         logger.error(f"Reprint check stub failed: {e}")
         return {"error": f"Reprint check stub failed: {e}"}
@@ -12090,6 +12545,8 @@ def get_allowed_employee_list(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get allowed employee list")
     except Exception as e:
         logger.error(f"Get allowed employee list failed: {e}")
         return {"error": f"Get allowed employee list failed: {e}"}
@@ -12141,6 +12598,8 @@ def get_client_list_security(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get client list security")
     except Exception as e:
         logger.error(f"Get client list security failed: {e}")
         return {"error": f"Get client list security failed: {e}"}
@@ -12197,6 +12656,8 @@ def get_employee_client_list(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get employee client list")
     except Exception as e:
         logger.error(f"Get employee client list failed: {e}")
         return {"error": f"Get employee client list failed: {e}"}
@@ -12251,6 +12712,8 @@ def get_employee_list_security(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get employee list security")
     except Exception as e:
         logger.error(f"Get employee list security failed: {e}")
         return {"error": f"Get employee list security failed: {e}"}
@@ -12307,6 +12770,8 @@ def get_entity_access(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get entity access")
     except Exception as e:
         logger.error(f"Get entity access failed: {e}")
         return {"error": f"Get entity access failed: {e}"}
@@ -12361,6 +12826,8 @@ def get_manager_list(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get manager list")
     except Exception as e:
         logger.error(f"Get manager list failed: {e}")
         return {"error": f"Get manager list failed: {e}"}
@@ -12417,6 +12884,8 @@ def get_user_data_security(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get user data security")
     except Exception as e:
         logger.error(f"Get user data security failed: {e}")
         return {"error": f"Get user data security failed: {e}"}
@@ -12468,6 +12937,8 @@ def get_user_details(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get user details")
     except Exception as e:
         logger.error(f"Get user details failed: {e}")
         return {"error": f"Get user details failed: {e}"}
@@ -12524,6 +12995,8 @@ def get_user_list_security(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get user list security")
     except Exception as e:
         logger.error(f"Get user list security failed: {e}")
         return {"error": f"Get user list security failed: {e}"}
@@ -12577,6 +13050,8 @@ def get_user_role_details(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get user role details")
     except Exception as e:
         logger.error(f"Get user role details failed: {e}")
         return {"error": f"Get user role details failed: {e}"}
@@ -12617,6 +13092,8 @@ def get_user_roles_list() -> Dict[str, Any]:
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get user roles list")
     except Exception as e:
         logger.error(f"Get user roles list failed: {e}")
         return {"error": f"Get user roles list failed: {e}"}
@@ -12671,6 +13148,8 @@ def is_client_allowed(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Is client allowed")
     except Exception as e:
         logger.error(f"Is client allowed failed: {e}")
         return {"error": f"Is client allowed failed: {e}"}
@@ -12728,6 +13207,8 @@ def is_employee_allowed(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Is employee allowed")
     except Exception as e:
         logger.error(f"Is employee allowed failed: {e}")
         return {"error": f"Is employee allowed failed: {e}"}
@@ -12792,6 +13273,8 @@ def get_user_list_v2(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get user list v2")
     except Exception as e:
         logger.error(f"Get user list v2 failed: {e}")
         return {"error": f"Get user list v2 failed: {e}"}
@@ -12845,6 +13328,8 @@ def get_employee_image(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get employee image")
     except Exception as e:
         logger.error(f"Get employee image failed: {e}")
         return {"error": f"Get employee image failed: {e}"}
@@ -12896,6 +13381,8 @@ def get_favorites(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get favorites")
     except Exception as e:
         logger.error(f"Get favorites failed: {e}")
         return {"error": f"Get favorites failed: {e}"}
@@ -12953,6 +13440,8 @@ def get_vendor_info(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get vendor info")
     except Exception as e:
         logger.error(f"Get vendor info failed: {e}")
         return {"error": f"Get vendor info failed: {e}"}
@@ -13005,6 +13494,8 @@ def get_all_subscriptions(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get all subscriptions")
     except Exception as e:
         logger.error(f"Get all subscriptions failed: {e}")
         return {"error": f"Get all subscriptions failed: {e}"}
@@ -13064,6 +13555,8 @@ def get_events(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get events")
     except Exception as e:
         logger.error(f"Get events failed: {e}")
         return {"error": f"Get events failed: {e}"}
@@ -13122,6 +13615,8 @@ def get_new_events(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get new events")
     except Exception as e:
         logger.error(f"Get new events failed: {e}")
         return {"error": f"Get new events failed: {e}"}
@@ -13173,6 +13668,8 @@ def get_subscription(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get subscription")
     except Exception as e:
         logger.error(f"Get subscription failed: {e}")
         return {"error": f"Get subscription failed: {e}"}
@@ -13240,6 +13737,8 @@ def get_ach_file_list(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get ACH file list")
     except Exception as e:
         logger.error(f"Get ACH file list failed: {e}")
         return {"error": f"Get ACH file list failed: {e}"}
@@ -13303,6 +13802,8 @@ def get_ar_transaction_report(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get AR transaction report")
     except Exception as e:
         logger.error(f"Get AR transaction report failed: {e}")
         return {"error": f"Get AR transaction report failed: {e}"}
@@ -13366,6 +13867,8 @@ def get_data(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get data")
     except Exception as e:
         logger.error(f"Get data failed: {e}")
         return {"error": f"Get data failed: {e}"}
@@ -13420,6 +13923,8 @@ def get_employer_details(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get employer details")
     except Exception as e:
         logger.error(f"Get employer details failed: {e}")
         return {"error": f"Get employer details failed: {e}"}
@@ -13480,6 +13985,8 @@ def get_invoice_data(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get invoice data")
     except Exception as e:
         logger.error(f"Get invoice data failed: {e}")
         return {"error": f"Get invoice data failed: {e}"}
@@ -13544,6 +14051,8 @@ def get_multi_entity_group_list(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get multi entity group list")
     except Exception as e:
         logger.error(f"Get multi entity group list failed: {e}")
         return {"error": f"Get multi entity group list failed: {e}"}
@@ -13600,6 +14109,8 @@ def get_payee(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get payee")
     except Exception as e:
         logger.error(f"Get payee failed: {e}")
         return {"error": f"Get payee failed: {e}"}
@@ -13660,6 +14171,8 @@ def get_payments_pending(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get payments pending")
     except Exception as e:
         logger.error(f"Get payments pending failed: {e}")
         return {"error": f"Get payments pending failed: {e}"}
@@ -13702,6 +14215,8 @@ def get_positive_pay_check_stub() -> Dict[str, Any]:
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get positive pay check stub")
     except Exception as e:
         logger.error(f"Get positive pay check stub failed: {e}")
         return {"error": f"Get positive pay check stub failed: {e}"}
@@ -13782,6 +14297,8 @@ def get_positive_pay_file_list(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get positive pay file list")
     except Exception as e:
         logger.error(f"Get positive pay file list failed: {e}")
         return {"error": f"Get positive pay file list failed: {e}"}
@@ -13854,6 +14371,8 @@ def get_unbilled_benefit_adjustments(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get unbilled benefit adjustments")
     except Exception as e:
         logger.error(f"Get unbilled benefit adjustments failed: {e}")
         return {"error": f"Get unbilled benefit adjustments failed: {e}"}
@@ -13894,6 +14413,8 @@ def identify_ach_process_lock() -> Dict[str, Any]:
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Identify ACH process lock")
     except Exception as e:
         logger.error(f"Identify ACH process lock failed: {e}")
         return {"error": f"Identify ACH process lock failed: {e}"}
@@ -13966,6 +14487,8 @@ def positive_pay_download(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Positive pay download")
     except Exception as e:
         logger.error(f"Positive pay download failed: {e}")
         return {"error": f"Positive pay download failed: {e}"}
@@ -14024,6 +14547,8 @@ def recreate_positive_pay(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Recreate positive pay")
     except Exception as e:
         logger.error(f"Recreate positive pay failed: {e}")
         return {"error": f"Recreate positive pay failed: {e}"}
@@ -14078,6 +14603,8 @@ def stream_ach_data(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Stream ACH data")
     except Exception as e:
         logger.error(f"Stream ACH data failed: {e}")
         return {"error": f"Stream ACH data failed: {e}"}
@@ -14132,6 +14659,8 @@ def get_suta_information(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get SUTA information")
     except Exception as e:
         logger.error(f"Get SUTA information failed: {e}")
         return {"error": f"Get SUTA information failed: {e}"}
@@ -14188,6 +14717,8 @@ def get_tax_authorities(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get tax authorities")
     except Exception as e:
         logger.error(f"Get tax authorities failed: {e}")
         return {"error": f"Get tax authorities failed: {e}"}
@@ -14253,6 +14784,8 @@ def get_tax_rate(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get tax rate")
     except Exception as e:
         logger.error(f"Get tax rate failed: {e}")
         return {"error": f"Get tax rate failed: {e}"}
@@ -14306,6 +14839,8 @@ def get_state_w4_params(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get state W4 params")
     except Exception as e:
         logger.error(f"Get state W4 params failed: {e}")
         return {"error": f"Get state W4 params failed: {e}"}
@@ -14357,6 +14892,8 @@ def get_workers_comp_classes(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get workers comp classes")
     except Exception as e:
         logger.error(f"Get workers comp classes failed: {e}")
         return {"error": f"Get workers comp classes failed: {e}"}
@@ -14408,6 +14945,8 @@ def get_workers_comp_policy_details(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get workers comp policy details")
     except Exception as e:
         logger.error(f"Get workers comp policy details failed: {e}")
         return {"error": f"Get workers comp policy details failed: {e}"}
@@ -14460,6 +14999,8 @@ def get_workers_comp_policy_list(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get workers comp policy list")
     except Exception as e:
         logger.error(f"Get workers comp policy list failed: {e}")
         return {"error": f"Get workers comp policy list failed: {e}"}
@@ -14514,6 +15055,8 @@ def get_timesheet_batch_status(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get timesheet batch status")
     except Exception as e:
         logger.error(f"Get timesheet batch status failed: {e}")
         return {"error": f"Get timesheet batch status failed: {e}"}
@@ -14572,6 +15115,8 @@ def get_timesheet_param_data(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get timesheet param data")
     except Exception as e:
         logger.error(f"Get timesheet param data failed: {e}")
         return {"error": f"Get timesheet param data failed: {e}"}
@@ -14623,6 +15168,8 @@ def get_pay_import_definition(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get pay import definition")
     except Exception as e:
         logger.error(f"Get pay import definition failed: {e}")
         return {"error": f"Get pay import definition failed: {e}"}
@@ -14677,6 +15224,8 @@ def get_timesheet_data(
         
         return result
         
+    except urllib.error.HTTPError as e:
+        return handle_http_error(e, "Get timesheet data")
     except Exception as e:
         logger.error(f"Get timesheet data failed: {e}")
         return {"error": f"Get timesheet data failed: {e}"}
