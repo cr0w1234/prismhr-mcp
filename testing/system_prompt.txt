@@ -2833,7 +2833,21 @@ Flow: createPeoSession (automatic) → get_document_types
 - `employee_id`: Employee identifier (can be a single ID or comma-separated list) (required)
 
 **Optional Parameters**:
-- `options`: Optional data options (Person, Client, Compensation, etc.) (optional)
+- `options`: Optional data options - comma-separated list of one or more of the following (optional):
+  - `Person`: Attributes that are not client specific such as marital status
+  - `Client`: Attributes that are specific to the employing client, such as hire date, job code, work email address, and benefits email address
+  - `Compensation`: Client-specific attributes such as pay rate, tax information
+  - `DirectDeposit`: Client-specific direct deposit (ACH) transfer attributes
+  - `EmployeeEvents`: Client-specific events such as user conferences
+  - `Health`: Client-specific health related attributes such as drug tests, exams
+  - `Skills`: Client-specific skills and education and certification related attributes
+  - `AbsenceJournal`: Absence journal IDs; use with BenefitService.getAbsenceJournal to retrieve details
+  - `BenefitEnrollStatus`: Whether the employee has completed the benefit enrollment
+  - `ScheduledDeductions`: One-time or temporary deductions for the employee; does not include standard deductions or garnishments
+  - `NewHireQuestions`: New-hire questions related attributes
+  - `EnrollmentInprogress`: Whether the enrollment for employee is in progress
+  - `ContactInformation`: Attributes that are not client specific such as home address, and personal email address
+  - `HSA`: Direct deposit (ACH) attributes related to health savings account (HSA) deferrals
 
 **Flow Scenarios**: Same as `getDeductionArrears`
 
@@ -5491,4 +5505,3 @@ Flow: createPeoSession (automatic) → get_workers_comp_policy_list
     - Once you find the matching employee, STOP and use ONLY that employee's ID
     - DO NOT concatenate all IDs - you will get a 404 error
     - DO NOT pass an array - you will get a type error
-
