@@ -1,0 +1,983 @@
+Query: Subject: Employee Status InquiryBody:Hi, can you check if we are still paying Mary Boyd? She hasn't worked here in a while and I want to make sure her payroll has been stopped. Client ID is 132.
+
+--- MCP Tool Calls ---
+Tool: get_employee_list
+Arguments: {"client_id":"132","status_class":null,"type_class":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"J00809","options":null}
+Tool: get_employee_payroll_summary
+Arguments: {"client_id":"132","employee_id":"J00809","year":"2024"}
+
+--- Response ---
+I have checked on employee Mary Boyd for client 132. Here’s what I found:
+
+- Employee: Mary Boyd (ID: J00809) is in your system as an employee for client 132.
+- Payroll Activity: She has active payroll records in 2024, with the last pay date being **December 27, 2024**. Each recent week shows regular earnings and direct deposit activity.
+
+**Conclusion:**  
+Mary Boyd is still being paid as of the most recent payrolls. If she is no longer working for your organization, her payroll has not yet been stopped in the system. I recommend taking action to update her employment status or reaching out to your payroll administrator to terminate further payments.
+
+If you need step-by-step help in stopping her payroll or terminating her in the system, let me know and I can guide you!
+
+================================================================================
+
+Query: Subject: Employee Information RequestBody:I need to get the details for Maria Fletcher who works for client 132. Can you provide her employee information including her compensation details?
+
+--- MCP Tool Calls ---
+Tool: get_employee_list
+Arguments: {"client_id":"132","status_class":null,"type_class":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"J00809","options":"Compensation"}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"K00810","options":"Compensation"}
+
+--- Response ---
+Here is the employee information and compensation details for **Maria Fletcher** at client 132:
+
+---
+
+### Employee: Maria Fletcher
+
+- **Employee ID**: K00810
+- **Client ID**: 132
+- **First Name**: Maria
+- **Last Name**: Fletcher
+- **Compensation Details**:
+  - **Pay Group**: WFRI
+  - **Pay Period**: Weekly (W)
+  - **Default Hours per Week**: 40.00
+  - **Pay Method**: Salary (S)
+  - **Salary (Weekly)**: $1,100.00
+  - **Annual Pay**: $57,200.00
+  - **Hourly Pay Equivalent**: $27.50
+  - **Last Pay Date**: 2025-08-08
+  - **Federal Filing Status**: Married (M)
+  - **Federal Withholding Allowance**: 4
+  - **State**: PA, Filing Status: Married (M), Allowances: 4
+  - **Compensation Effective Date**: 2017-01-04
+  - **Form I-9 Filed**: Yes
+- **Citizenship**: A citizen of the United States
+
+---
+
+If you need more details (such as contact info, benefits, or deductions), please specify!
+
+================================================================================
+
+Query: Subject: Employee Deductions InquiryBody:I'm reviewing the payroll for client 132 and noticed that Evan Jenkins might have deductions set up. Can you check what deductions are currently active for Evan Jenkins?
+
+--- MCP Tool Calls ---
+Tool: get_employee_list
+Arguments: {"client_id":"132","status_class":null,"type_class":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"J00809","options":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"K00810","options":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"L00811","options":null}
+Tool: get_deductions
+Arguments: {"client_id":"132","employee_id":"L00811","options":""}
+
+--- Response ---
+Evan Jenkins currently has the following active payroll deductions set up for client 132:
+
+### Pre-Tax and Post-Tax Deductions
+- **401k Deferral**: 10% of pay
+- **401k Post Tax**: $0 (code exists, but amount is $0)
+- **401(k) Catch Up**: $0
+- **Roth 401(k)**: $0
+- **Roth 4K Catchup**: $0
+
+### Benefit Plan Deductions
+- **Medical** (Pre-Tax/Section 125): $242.89 per period
+- **Dental** (Pre-Tax/Section 125): $24.04 per period
+- **Medical (EAP)**: $0 (code exists, but amount is $0)
+- **Life Insurance**: $0 (code exists, but amount is $0)
+- **Long Term Disability**: $15.38 per period
+- **Short Term Disability**: $0 (code exists, but amount is $0)
+- **Vision Pre-Tax**: $4.36 per period
+
+#### Notes:
+- Only the deductions with a dollar amount greater than $0 are currently active in terms of payroll withholding. The codes showing $0 exist in Evan’s deduction setup but aren’t currently withholding any amount.
+- Common active deductions for Evan Jenkins are 401k (10% of pay), Medical ($242.89), Dental ($24.04), Long Term Disability ($15.38), and Vision ($4.36).
+
+If you need more detail on any particular deduction, let me know!
+
+================================================================================
+
+Query: Subject: Employee Benefits InquiryBody:What benefits does Salvatore Martinez have enrolled in? He's asking about his health insurance coverage. Client 132.
+
+--- MCP Tool Calls ---
+Tool: get_employee_list
+Arguments: {"client_id":"132","status_class":null,"type_class":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"J00809","options":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"K00810","options":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"L00811","options":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"M00812","options":null}
+Tool: get_active_benefit_plans
+Arguments: {"client_id":"132","employee_id":"M00812","plan_id":null,"effective_date":null}
+
+--- Response ---
+Salvatore Martinez (Client 132) is currently enrolled in the following benefit plans:
+
+### Active Enrolled Benefits
+
+1. **EAP (Employee Assistance Program)**
+   - Status: Active
+   - Coverage Start: 2017-01-04
+   - Coverage End: (Still Active)
+   - Description: EAP
+
+2. **Life Insurance**
+   - Status: Active
+   - Coverage Start: 2017-03-01
+   - Coverage End: (Still Active)
+   - Description: Life Insurance
+   - Latest coverage amount: $52,000.00
+   - Employee Premium: $32.50 (most recent plan detail)
+   - Benefit includes group term life coverage accruals by tax year
+
+3. **Long Term Disability**
+   - Status: Active
+   - Coverage Start: 2017-03-01
+   - Coverage End: (Still Active)
+   - Description: Long Term Disability
+   - Latest coverage amount: $3,100.00
+   - Employee Premium: $48.50
+
+---
+
+### Health Insurance Coverage
+
+Currently, there is **no active health insurance (medical) plan enrolled** for Salvatore Martinez under Client 132 based on the benefit plan list above. His active benefits are Limited to:
+- EAP
+- Life Insurance
+- Long Term Disability
+
+**If you believe Salvatore should be enrolled in a medical/health insurance plan and do not see it here, please confirm with HR or review recent enrollment/waiver activity for medical plans.**
+
+Let me know if you would like information on dependents, past coverage, or additional benefit details!
+
+================================================================================
+
+Query: Subject: Employee Termination StatusBody:Has Maria Fletcher been terminated? I see her name in the system but want to confirm her current employment status for client 132.
+
+--- MCP Tool Calls ---
+Tool: get_employee_list
+Arguments: {"client_id":"132","status_class":null,"type_class":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"J00809","options":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"K00810","options":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"K00810","options":"Status"}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"K00810","options":"Person,Client,Compensation,EmployeeEvents"}
+
+--- Response ---
+Maria Fletcher is currently **active** with client 132. Her employee status code is `"A"` (Active), and there is no indication of termination in her record.
+
+**Details**:
+- **First Name:** Maria
+- **Last Name:** Fletcher
+- **Status:** Active (employeeStatus: "A", statusClass: "A")
+- **Status Date:** 2017-01-04
+- **No termination reason or explanation is present** in her employee data.
+
+**Conclusion:**  
+Maria Fletcher has **not** been terminated and is still an active employee for client 132.
+
+================================================================================
+
+Query: Subject: Employee Compensation ReviewBody:I need to review the compensation structure for all employees in client 132. Can you provide a summary of their pay rates and employment types?
+
+--- MCP Tool Calls ---
+Tool: get_employee_list
+Arguments: {"client_id":"132","status_class":null,"type_class":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"J00809","options":"Compensation,Client"}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"K00810","options":"Compensation,Client"}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"L00811","options":"Compensation,Client"}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"M00812","options":"Compensation,Client"}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"S00816","options":"Compensation,Client"}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"T00817","options":"Compensation,Client"}
+
+--- Response ---
+Here is a summary of the compensation structure for all employees in client 132, including their pay rates and employment types:
+
+| Employee Name         | Employee Type | Pay Method | Hourly Rate    | Salary (per week) | Annual Pay     |
+|----------------------|--------------|------------|----------------|------------------|---------------|
+| Mary Boyd            | Full-Time    | Hourly     | $26.46         |                  | $55,036.80    |
+| Maria Fletcher       | Full-Time    | Salary     | $27.50*        | $1,100.00        | $57,200.00    |
+| Evan Jenkins         | Full-Time    | Salary     | $20.00**       | $800.00          | $41,600.00    |
+| Salvatore Martinez   | Full-Time    | Salary     | $25.00         | $1,000.00        | $52,000.00    |
+| Debra Barksdale      | Full-Time    | Salary     | $1,595.00      | $63,800.00       | $3,317,600.00 |
+| Mark Harris          | Full-Time    | Salary     | $25.00         | $1,000.00        | $52,000.00    |
+
+**Notes:**
+- **Pay Method:** "Hourly" means paid by the hour, "Salary" means paid by a salary amount each pay period.
+- *Maria Fletcher's rate is represented in both salary ($1,100/week) and a calculated hourly rate ($27.50) based on a 40-hour week.
+- **Evan Jenkins' hourly rate ($20.00) is shown as a comparison; actual pay is based on the listed weekly salary.
+- All employees listed are Full-Time (FT).
+
+If you need more specifics (such as pay group, pay frequency, department, etc.) or a different view by department or position, please let me know!
+
+================================================================================Loading system prompt from: system_prompt.txt
+
+================================================================================
+NEW SESSION STARTED: 2025-11-06 18:02:55
+================================================================================
+
+================================================================================
+PrismHR MCP Server Test - Interactive Mode
+================================================================================
+Type your questions below. Type 'quit' or 'exit' to stop.
+
+Query: Subject: Employee Benefits EnrollmentBody:What benefits plans are available and which employees from client 132 are enrolled in each plan? I need this for our benefits audit.
+
+--- MCP Tool Calls ---
+Tool: get_client_benefit_plans
+Arguments: {"client_id":"132"}
+Tool: get_employee_list
+Arguments: {"client_id":"132","status_class":null,"type_class":null}
+Tool: get_active_benefit_plans
+Arguments: {"client_id":"132","employee_id":"J00809","plan_id":null,"effective_date":null}
+Tool: get_active_benefit_plans
+Arguments: {"client_id":"132","employee_id":"K00810","plan_id":null,"effective_date":null}
+Tool: get_active_benefit_plans
+Arguments: {"client_id":"132","employee_id":"L00811","plan_id":null,"effective_date":null}
+Tool: get_active_benefit_plans
+Arguments: {"client_id":"132","employee_id":"M00812","plan_id":null,"effective_date":null}
+Tool: get_active_benefit_plans
+Arguments: {"client_id":"132","employee_id":"S00816","plan_id":null,"effective_date":null}
+Tool: get_active_benefit_plans
+Arguments: {"client_id":"132","employee_id":"T00817","plan_id":null,"effective_date":null}
+
+--- Response ---
+To answer your inquiry ("What benefit plans are available and which employees from client 132 are enrolled in each plan?") for your benefits audit, I will follow the correct endpoint flow according to the PrismHR documentation:
+
+**Step 1: Get all benefit plans available for client 132.**
+- Endpoint: get_client_benefit_plans (client_id = "132")
+- This gives the list of benefit plans for client 132.
+
+**Step 2: For each benefit plan, determine which employees are enrolled.**
+- First, get all employees for client 132 (get_employee_list).
+- Then, for each employee, get their active benefit plans (get_active_benefit_plans), and see which plan(s) they are enrolled in.
+
+I'll retrieve the benefit plans for client 132, then get the list of employees, and cross-reference enrollment. Let's start:
+
+---
+
+### 1. Get all benefit plans for client 132.
+Here’s your requested summary for client 132:  
+## 1. Benefit Plans Available
+
+| Plan ID         | Plan Description              |
+|-----------------|------------------------------|
+| DENAET          | AETNA Dental                 |
+| ACCHI           | Accident Insurance High      |
+| ACCLO           | Accident Insurance Low       |
+| BCBSPPO1000     | BCBS PPO 1000               |
+| BCBS            | BCBS PPO 2500               |
+| EAP             | EAP                          |
+| KERM            | Kaiser Permentente HDHP      |
+| LIFESAL         | Life Insurance               |
+| LIFE            | Life Insurance Voluntary     |
+| LTD             | Long Term Disability         |
+| DENMET          | MET LIFE Dental              |
+| STD             | Short Term Disability        |
+| TUFTHMO         | Tuft's HMO                   |
+| VISVSP          | VSP Vision                   |
+
+
+---
+
+## 2. Employees enrolled in each plan
+
+### BCBS PPO 1000 (BCBSPPO1000)
+- **J00809**
+
+### BCBS PPO 2500 (BCBS)
+- **L00811**
+
+### AETNA Dental (DENAET)
+- **J00809**
+
+### MET LIFE Dental (DENMET)
+- **L00811**
+
+### EAP
+- **J00809**
+- **K00810**
+- **L00811**
+- **M00812**
+- **S00816**
+- **T00817**
+
+### Life Insurance (LIFESAL)
+- **J00809**
+- **K00810**
+- **L00811**
+- **M00812**
+- **S00816**
+- **T00817**
+
+### Long Term Disability (LTD)
+- **J00809**
+- **K00810**
+- **L00811**
+- **M00812**
+- **S00816**
+- **T00817**
+
+### Short Term Disability (STD)
+- **L00811**
+
+### VSP Vision (VISVSP)
+- **J00809**
+- **L00811**
+
+---
+
+**Notes:**
+- Not all plans from the available list show current enrollments — this often means those are voluntary/not actively enrolled at this time, or enrollment data is not present for the six currently listed employees.
+- The employee IDs above are currently enrolled. If you need full employee names, let me know and I can retrieve those as well.
+
+Would you like to see full employee details or export this data?
+
+================================================================================
+
+Query: Subject: Employee Direct Deposit InformationBody:Can you check if Mary Boyd has direct deposit set up? Client 132. She's asking about her bank account information on file.
+
+--- MCP Tool Calls ---
+Tool: get_employee_list
+Arguments: {"client_id":"132","status_class":null,"type_class":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"J00809","options":null}
+Tool: get_ach_deductions
+Arguments: {"client_id":"132","employee_id":"J00809"}
+
+--- Response ---
+I checked the direct deposit (ACH) setup for Mary Boyd in client 132:
+
+- There is currently NO direct deposit (ACH) account set up for Mary Boyd in the system. The ACH settings list is empty.
+
+If Mary believes she should have bank account details on file for payroll, she may need to update her direct deposit information or contact HR/payroll for assistance. If she expects an account to be on file, it's possible it was not entered, has expired, or there is a technical issue.
+
+Let me know if you want to see other payroll or deduction details for Mary Boyd.
+
+================================================================================
+
+Query: Subject: Employee Time Off BalanceBody:Evan Jenkins is requesting time off. Can you check his current PTO or leave balance? Client 132.
+
+--- MCP Tool Calls ---
+Tool: get_employee_list
+Arguments: {"client_id":"132","status_class":null,"type_class":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"J00809","options":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"K00810","options":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"L00811","options":null}
+Tool: get_paid_time_off
+Arguments: {"client_id":"132","employee_id":"L00811"}
+
+--- Response ---
+**Evan Jenkins' Current PTO/Leave Balance for Client 132:**
+
+**Vacation (PTO):**
+- Carryover Hours: **1,480.00**
+- Accrued Year-to-Date (YTD): **200.00**
+- Used YTD: **0.00**
+- Accrued Through: **2025-12-31**
+
+**Sick Leave:**
+- Carryover Hours: **891.65**
+- Accrued YTD: **71.31**
+- Used YTD: **0.00**
+- Accrued Through: **2025-08-02**
+
+**Summary:**  
+Evan Jenkins currently has very large available balances in both Vacation (PTO) and Sick leave buckets, with no hours used so far this year.
+
+If you need balances in a specific category or additional detail, let me know!
+
+================================================================================
+
+Query: Subject: Employee Contact InformationBody:I need to get the contact information for Salvatore Martinez. Client 132. Can you provide his address and phone number?
+
+--- MCP Tool Calls ---
+Tool: get_employee_list
+Arguments: {"client_id":"132","status_class":null,"type_class":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"J00809","options":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"K00810","options":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"L00811","options":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"M00812","options":null}
+Tool: get_address_info
+Arguments: {"client_id":"132","employee_id":"M00812"}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"M00812","options":"Person"}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"M00812","options":"Contact"}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"M00812","options":"ContactInformation"}
+
+--- Response ---
+Here is the contact information for Salvatore Martinez in client 132:
+
+**Address:**
+315 Pacific Waterway  
+EAST SPARTA, OH 44626  
+County: STARK
+
+**Phone Number:**
+Mobile: 717-565-4542
+
+If you need his email as well: smartinez@maxwell.com
+
+Let me know if you need additional information!
+
+================================================================================
+
+Query: Subject: Employee Tax InformationBody:What are the tax withholdings set up for Debra Barksdale? Client 132. She wants to verify her W-4 settings.
+
+--- MCP Tool Calls ---
+Tool: get_employee_list
+Arguments: {"client_id":"132","status_class":null,"type_class":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"J00809","options":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"K00810","options":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"L00811","options":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"M00812","options":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"S00816","options":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"S00816","options":"Person"}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"S00816","options":"Tax"}
+
+--- Response ---
+The PrismHR API does not provide W-4 or tax withholding setup directly via an "options" parameter for the get_employee endpoint. However, the W-4 tax elections for an employee are typically managed as part of payroll deductions and tax setup in the PrismHR system.
+
+**Here's what I was able to do:**
+- I identified Debra Barksdale as employee ID S00816 for client 132.
+- Employee personal info is available, but tax withholding elections (like W-4 Federal/State allowances, additional withholdings) are NOT accessible directly via the get_employee endpoint options.
+
+**Next Step:**
+To view or verify Debra Barksdale's W-4 elections (federal/state tax withholding settings), you will likely need:
+1. An administrator or payroll manager with PrismHR backend access to pull the employee's tax setup.
+2. Use the PrismHR ESS (employee self-service) portal, where the latest W-4 (or state equivalent) selections and their current effective elections are typically available for the employee to review.
+
+**API Limitation:**  
+The API currently does not return W-4 form data or display current W-4 selections for an employee.
+
+**Recommendation:**  
+- Please log in to your PrismHR HRIS or ESS portal as either the employee (Debra Barksdale) or as an admin/payroll manager.  
+- Navigate to Debra's employee profile  
+- Go to the "Taxes" or "W-4" section/tab  
+- Review the currently effective W-4 form and tax withholding selections (allowances, extra withholding, marital status, etc.)
+
+If you need help finding this screen in the web portal, let me know! If your organization has a specific API endpoint or report for W-4 data, please provide further detail, and I can assist with that flow.
+
+================================================================================
+
+Query: Subject: Employee Emergency ContactsBody:I need the emergency contact information for Mark Harris. Client 132. This is for our records update.
+
+--- MCP Tool Calls ---
+Tool: get_employee_list
+Arguments: {"client_id":"132","status_class":null,"type_class":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"J00809","options":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"K00810","options":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"L00811","options":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"M00812","options":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"S00816","options":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"T00817","options":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"T00817","options":"Person"}
+
+--- Response ---
+I have located Mark Harris in client 132.
+
+Currently, there are no emergency contact details listed for Mark Harris in the system; the emergencyContact field is empty.
+
+**Summary for Records Update:**
+- Employee: Mark Harris
+- Client: 132
+- Emergency Contacts: None listed in PrismHR as of now.
+
+If you need a screenshot or export, or want to add/update this information, please let me know how you'd like to proceed.
+
+================================================================================
+
+Query: Subject: Employee History RequestBody:Can you provide the employment history for Mary Boyd? Client 132. I need to know her hire date and any status changes.
+
+--- MCP Tool Calls ---
+Tool: get_employee_list
+Arguments: {"client_id":"132","status_class":null,"type_class":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"J00809","options":null}
+Tool: get_history
+Arguments: {"client_id":"132","employee_id":"J00809","type":["S"]}
+
+--- Response ---
+Here is the employment history for Mary Boyd (Client 132):
+
+- **Hire (Active) Date:** October 3, 2016
+- **Status Change(s):**
+  - On 2016-10-03, Mary Boyd was set to "Active" (Status Code: "A") as a full-time employee (Type: FT).
+
+No additional status changes or terminations were found in her current employment history record. If you need more details (such as pay, department changes, or benefit group changes), please specify.
+
+================================================================================
+
+Query: Subject: Employee Garnishments InquiryBody:Does Maria Fletcher have any active garnishments? Client 132. I'm reviewing payroll deductions.
+
+--- MCP Tool Calls ---
+Tool: get_employee_list
+Arguments: {"client_id":"132","status_class":null,"type_class":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"J00809","options":null}
+Tool: get_employee
+Arguments: {"client_id":"132","employee_id":"K00810","options":null}
+Tool: check_for_garnishments
+Arguments: {"client_id":"132","employee_id":"K00810"}
+
+--- Response ---
+Maria Fletcher (client 132) does not have any active garnishments. According to the payroll system, there are currently no enrolled or active garnishments on file for her.
+
+If you need information about her other payroll deductions or want a detailed breakdown, let me know!
+
+================================================================================
+
+Query: Subject: Employee 401k EnrollmentBody:Which employees from client 132 are enrolled in the 401k plan? I need this information for our retirement plan audit.
+
+--- MCP Tool Calls ---
+Tool: get_client_benefit_plans
+Arguments: {"client_id":"132"}
+Tool: get_retirement_plan_list
+Arguments: {"client_id":"132","count":null,"startpage":null}
+Tool: get_employee_list
+Arguments: {"client_id":"132","status_class":"A","type_class":null}
+Tool: get_active_benefit_plans
+Arguments: {"client_id":"132","employee_id":"J00809","plan_id":null,"effective_date":null}
+Tool: get_active_benefit_plans
+Arguments: {"client_id":"132","employee_id":"K00810","plan_id":null,"effective_date":null}
+Tool: get_active_benefit_plans
+Arguments: {"client_id":"132","employee_id":"L00811","plan_id":null,"effective_date":null}
+Tool: get_active_benefit_plans
+Arguments: {"client_id":"132","employee_id":"M00812","plan_id":null,"effective_date":null}
+Tool: get_active_benefit_plans
+Arguments: {"client_id":"132","employee_id":"S00816","plan_id":null,"effective_date":null}
+Tool: get_active_benefit_plans
+Arguments: {"client_id":"132","employee_id":"T00817","plan_id":null,"effective_date":null}
+
+--- Response ---
+After checking all active employees in client 132 and their benefit enrollments, **none of the currently active employees (IDs: J00809, K00810, L00811, M00812, S00816, T00817) are enrolled in a 401k plan**.
+
+**Findings:**
+- Each employee’s active benefit plans (based on "planId", and "description") were reviewed.
+- No currently active employee has a 401k or retirement plan enrollment listed among their active benefit plans. The plans found are medical, dental, vision, life, disability, or other non-retirement benefits.
+
+**If you expected some employees to be enrolled in a 401k plan:**
+- It might be that enrollment is not reflected as an "Active Benefit Plan" but somewhere else, or the benefit plan is named differently—please provide a specific 401k plan ID or description if you have one.
+- Alternatively, the 401k/retirement plan may not be currently active for any employee.
+
+Do you want me to check for retired, terminated, or previous employees, or search using additional criteria?
+
+================================================================================
+
+Query: Subject: Employee Status Check - Planning SolutionsBody:Hi, can you check if Blastion Peter is still an active employee for Planning Solutions (client 120)? I need to verify his current employment status.
+
+--- MCP Tool Calls ---
+Tool: get_employee_list
+Arguments: {"client_id":"120","status_class":null,"type_class":null}
+Tool: get_employee
+Arguments: {"client_id":"120","employee_id":"M00036","options":null}
+Tool: get_employee
+Arguments: {"client_id":"120","employee_id":"M00036","options":"Status"}
+Tool: get_employee
+Arguments: {"client_id":"120","employee_id":"M00036","options":"Client"}
+
+--- Response ---
+Yes, Blastion Peter is currently an active employee for Planning Solutions (client 120).
+
+**Details:**
+- **Name:** Blastion Peter
+- **Client:** Planning Solutions (client ID: 120)
+- **Employee Status:** A (Active)
+- **Status Class:** A (Active)
+- **Employee Type:** FT (Full-Time)
+- **Employment Start Date:** 2018-04-01
+
+Blastion Peter is still employed and active with Planning Solutions as of now. If you need any additional details, please let me know!
+
+================================================================================
+
+Query: Subject: Employee Information Request - Metro StaffingBody:I need to get the employee details for Naomi Little who works for Metro Staffing Internal Staff. Can you provide her compensation and contact information?
+
+--- MCP Tool Calls ---
+Tool: get_client_list
+Arguments: {"in_active":null}
+Tool: get_employee_list
+Arguments: {"client_id":"147","status_class":null,"type_class":null}
+Tool: get_employee
+Arguments: {"client_id":"147","employee_id":"A00264","options":"Person,Client,Compensation,Contact"}
+Tool: get_employee
+Arguments: {"client_id":"147","employee_id":"A00264","options":"Person,Client,Compensation,ContactInformation"}
+
+--- Response ---
+Here is the employee information for Naomi Little at Metro Staffing Internal Staff:
+
+---
+
+### Personal Details
+- **Employee Name:** Naomi Little
+- **Employee ID:** A00264
+- **Status:** Active (Full-Time)
+- **Job Title:** CEO
+- **Department:** Executive
+- **First Hire Date:** 2014-02-14
+- **Work Email:** Naomi.Little@metrostaffing.com
+- **Work Phone:** 800-549-1585 Ext. 100
+
+---
+
+### Contact Information
+- **Home Address:** 75 E Washington St, Chicago, IL 60602 (Cook County)
+- **Mobile Phone:** (not provided)
+- **Home Phone:** (not provided)
+- **Email:** (not provided)
+
+---
+
+### Compensation Information
+- **Annual Salary:** $110,000
+- **Pay Group:** INT-Weekly
+- **Pay Method:** Salary
+- **Default Weekly Pay Period Salary:** $2,115.38
+- **Other Period Equivalents:**
+  - Biweekly: $4,230.77
+  - Semi-monthly: $4,583.33
+  - Monthly: $9,166.67
+  - Annual: $110,000
+- **Hourly Rate:** $52.88 (for 40 hr/week basis)
+- **Standard/Default Hours:** 40 hours/week
+- **State Tax State:** IL
+- **Latest Salary Change Effective:** 2019-07-25
+- **SSN:** Redacted for privacy
+
+---
+
+If you need additional employment, benefits, or payroll details for Naomi Little, please specify!
+
+================================================================================
+
+Query: Subject: Employee List Request - Fairfield FinancialBody:Can you send me a list of all employees for Fairfield Financial? I need to verify who is currently on payroll.
+
+--- MCP Tool Calls ---
+Tool: get_client_list
+Arguments: {"in_active":null}
+Tool: get_employee_list
+Arguments: {"client_id":"136","status_class":"A","type_class":null}
+
+--- Response ---
+Fairfield Financial (Client ID: 136) currently has a large number of employees on payroll with active status. Here is a list of their Employee IDs:
+
+```
+A00001, A00121, A00145, A00217, A00289, B00002, B00122, B00146, B00218, B00242, B00290, B00338, C00003, C00123, C00147, C00219, C00267, C00291, C00363, D00004, D00124, D00148, D00172, D00268, D00340, E00005, E00052, E00125, E00149, E00173, E00269, E00341, E00900, F00006, F00126, F00150, F00294, F00342, G00007, G00127, G00151, G00175, G00199, G00271, G00295, G00343, H00008, H00128, H00152, H00224, H00296, H00487, H00903, I00009, I00129, I00201, I00273, J00010, J00130, J00154, J00274, J00298, K00011, K00058, K00131, K00155, K00299, K00347, K00418, L00012, L00132, L00156, L00204, L00252, L00276, L00348, M00133, M00157, M00229, M00349, N00014, N00134, N00158, N00206, N00302, P00015, P00159, P00231, P00279, P00303, R00136, R00160, R00184, R00304, S00137, S00161, S00233, S00257, S00281, T00138, T00162, U00139, U00163, U00235, U00283, U00307, U00331, V00116, V00140, V00164, V00188, V00260, V00284, V00332, V00356, W00117, W00141, W00165, W00237, W00309, X00093, X00118, X00142, X00166, X00286, X00310, Y00094, Y00119, Y00143, Y00167, Y00239, Y00263, Y00335, Z00120, Z00144, Z00216, Z00240, Z00288
+```
+
+If you would like to see further details (names, roles, etc.) for each employee, please specify the format or if you need a specific subset, and I can provide employee details as needed.
+
+================================================================================
+
+Query: Subject: Employee Deductions Inquiry - Fairfield FinancialBody:I'm reviewing the payroll register for Fairfield Financial. Can you check what deductions are set up for Omar Fields?
+
+--- MCP Tool Calls ---
+Tool: get_client_list
+Arguments: {"in_active":null}
+Tool: get_employee_list
+Arguments: {"client_id":"136","status_class":null,"type_class":null}
+Tool: get_employee
+Arguments: {"client_id":"136","employee_id":"A00001","options":null}
+Tool: get_deductions
+Arguments: {"client_id":"136","employee_id":"A00001","options":""}
+
+--- Response ---
+Here are the payroll deductions currently set up for Omar Fields at Fairfield Financial:
+
+**401(k) and Retirement Deductions**
+- 401k: 4% per period (Type: 401k)
+- 401k Post Tax: $0.00 (Type: 401k post-tax)
+- 401(k) Catch Up: $0.00 (Type: 401k catch up)
+- Roth 401(k): $0.00 (Type: Roth 401k)
+- Roth 401k Catch Up: $0.00 (Type: Roth 401k catch up)
+
+**Medical and Health Deductions**
+- Medical (Code: MED125): $0.00 per period (Pre-tax, Plan: BCBSPPO1000)
+- Medical (Code: MED): $0.00 per period (Plan: EAP)
+- Dental: $15.40 per period (Plan: DENMET)
+- Vision Pre-Tax: $2.55 per period (Plan: VISVSP)
+- Life Insurance: $0.00 per period (Plan: LIFESAL)
+- Long Term Disability: $4.44 per period (Plan: LTD)
+
+If you need the full details for any individual deduction (such as benefit plan IDs or further historical details), let me know!
+
+================================================================================
+
+Query: Subject: Employee Benefits Inquiry - Metro Staffing Lake BranchBody:What benefits is Miguel Owen enrolled in for Metro Staffing Lake Branch (client 149)? I need this for our benefits audit.
+
+--- MCP Tool Calls ---
+Tool: get_employee_list
+Arguments: {"client_id":"149","status_class":null,"type_class":null}
+Tool: get_employee
+Arguments: {"client_id":"149","employee_id":"A00336","options":null}
+Tool: get_active_benefit_plans
+Arguments: {"client_id":"149","employee_id":"A00336","plan_id":null,"effective_date":null}
+
+--- Response ---
+Miguel Owen (employee ID: A00336) is not currently enrolled in any active benefit plans with Metro Staffing Lake Branch (client 149), according to the PrismHR system.
+
+If you require historical enrollment information or need to verify eligibility for other plans, please let me know, and I can query further details or check for past enrollments.
+
+================================================================================
+
+Query: Subject: Employee Dependents Request - Tri City BankBody:Can you provide a list of dependents for Maggie Stevenson who works for Tri City Bank and Trust (client 125)?
+
+--- MCP Tool Calls ---
+Tool: get_employee_list
+Arguments: {"client_id":"125","status_class":null,"type_class":null}
+Tool: get_employee
+Arguments: {"client_id":"125","employee_id":"C00682","options":null}
+Tool: get_dependents
+Arguments: {"client_id":"125","employee_id":"C00682","dependent_id":null,"only_active":null}
+
+--- Response ---
+Maggie Stevenson is an employee at Tri City Bank and Trust (client 125). According to the records, she currently does not have any dependents listed in the system.
+
+If you believe there should be dependents associated with her file, you may want to confirm with HR or check if the information needs to be updated in the system. If you need details or another type of report, please let me know!
+
+================================================================================
+
+Query: Subject: Employee Termination Inquiry - Relaxation DestinationsBody:I need to check if Ruth Webber from Relaxation Destinations is still active. Can you verify her employment status?
+
+--- MCP Tool Calls ---
+Tool: get_client_list
+Arguments: {"in_active":null}
+Tool: get_employee_list
+Arguments: {"client_id":"138","status_class":null,"type_class":null}
+Tool: get_employee
+Arguments: {"client_id":"138","employee_id":"R00088","options":null}
+Tool: get_employee
+Arguments: {"client_id":"138","employee_id":"R00088","options":"Status"}
+Tool: get_employee
+Arguments: {"client_id":"138","employee_id":"R00088","options":"Client"}
+
+--- Response ---
+Ruth Webber is currently listed as "Active" (Status: **A**) with Relaxation Destinations. She is still employed and her employment status is active. 
+
+If you need further details (such as potential future terminations or her most recent employment activity), please let me know!
+
+================================================================================
+
+Query: Subject: Employee Compensation Details - Maryville MedicalBody:What is the current compensation structure for Eric Piccard at Maryville Medical? I need his salary and pay rate information.
+
+--- MCP Tool Calls ---
+Tool: get_client_list
+Arguments: {"in_active":null}
+Tool: get_employee_list
+Arguments: {"client_id":"126","status_class":null,"type_class":null}
+Tool: get_employee
+Arguments: {"client_id":"126","employee_id":"A00632","options":"Compensation"}
+
+--- Response ---
+Here is the current compensation structure for Eric Piccard at Maryville Medical:
+
+- **Employee Name:** Eric Piccard
+- **Employer:** Maryville Medical
+
+### Salary & Pay Rate Details
+- **Current Annual Salary:** $200,000.00
+- **Pay Method:** Salary (Code: "S")
+- **Default Pay Period Salary:** $7,692.31 (typically biweekly)
+- **Hourly Pay Rate:** $96.15 
+    - (Also shown: "hourlyPayRate": 200,000.00, with hourlyPayPeriod "A"—which is used for annualized salary calculations in some systems, but the primary salary is as above)
+- **Standard Hours per Pay Period:** 80.00
+
+#### Pay Period Breakdown (from system codes)
+- Weekly ("W"): $3,846.15
+- Biweekly ("B"): $7,692.31
+- Semi-monthly ("S"): $8,333.33
+- Monthly ("M"): $16,666.67
+- Annually ("A"): $200,000.00
+
+**Effective date of current pay:** 2012-11-05  
+**Last pay date:** 2025-08-08
+
+If you need further breakdowns (bonuses, alternate pay rates, etc.), let me know!
+
+================================================================================
+
+Query: Subject: Employee Contact Update - SRY CorporationBody:I need to get the current contact information for Roberto Hunter at SRY Corporation. Can you provide his address and phone number?
+
+--- MCP Tool Calls ---
+Tool: get_client_list
+Arguments: {"in_active":null}
+Tool: get_employee_list
+Arguments: {"client_id":"127","status_class":null,"type_class":null}
+Tool: get_employee
+Arguments: {"client_id":"127","employee_id":"A00073","options":null}
+Tool: get_address_info
+Arguments: {"client_id":"127","employee_id":"A00073"}
+Tool: get_employee
+Arguments: {"client_id":"127","employee_id":"A00073","options":"Person"}
+Tool: get_employee
+Arguments: {"client_id":"127","employee_id":"A00073","options":"Contact"}
+Tool: get_employee
+Arguments: {"client_id":"127","employee_id":"A00073","options":"ContactInformation"}
+
+--- Response ---
+Here is the current contact information for Roberto Hunter at SRY Corporation:
+
+**Address:**
+2212 Main Point  
+NORTH ATLANTA, GA 30319  
+County: DEKALB
+
+**Phone Number:**  
+No home or mobile phone number is listed in the contact record.
+
+**Email Address:**  
+prismhree@gmail.com
+
+If you need a phone number and it's required for your update, please let me know if there is another source you would like checked, or if you'd like a summary of other ways to reach Roberto.
+
+================================================================================
+
+Query: Subject: Employee Dependents List - Tri City BankBody:Can you provide a complete list of dependents for Bruce Padilla at Tri City Bank and Trust (client 125)? This is for our benefits administration.
+
+--- MCP Tool Calls ---
+Tool: get_employee_list
+Arguments: {"client_id":"125","status_class":null,"type_class":null}
+Tool: get_employee
+Arguments: {"client_id":"125","employee_id":"C00682","options":null}
+Tool: get_employee
+Arguments: {"client_id":"125","employee_id":"I00616","options":null}
+Tool: get_dependents
+Arguments: {"client_id":"125","employee_id":"I00616","dependent_id":null,"only_active":null}
+
+--- Response ---
+I have located Bruce Padilla at Tri City Bank and Trust (client 125). According to the PrismHR system, there are currently no dependents listed for Bruce Padilla under this client.
+
+If you believe dependents should be present or recently added, please confirm that they have been entered into the system, or let me know if you need to check under a different client or spelling. If you have any more requests related to Bruce Padilla's benefits administration or need a report format, let me know!
+
+================================================================================
+
+Query: Subject: Employee Information Request - Metro Staffing Lake BranchBody:I need comprehensive employee information for Miguel Owen at Metro Staffing Lake Branch, including personal details, compensation, and benefits.
+
+--- MCP Tool Calls ---
+Tool: get_client_list
+Arguments: {"in_active":null}
+Tool: get_employee_list
+Arguments: {"client_id":"149","status_class":null,"type_class":null}
+Tool: get_employee
+Arguments: {"client_id":"149","employee_id":"A00336","options":"Person,Client,Compensation"}
+Tool: get_active_benefit_plans
+Arguments: {"client_id":"149","employee_id":"A00336","plan_id":null,"effective_date":null}
+
+--- Response ---
+Here is comprehensive employee information for Miguel Owen at Metro Staffing Lake Branch, including personal details, compensation, and benefits summary:
+
+---
+
+### Personal Details
+- **Full Name:** Miguel Owen
+- **Client/Location:** Metro Staffing Lake Branch (Client ID: 149)
+- **Employee ID:** A00336
+- **Status:** Active, Full-time
+- **First Hire Date:** 2018-04-25
+- **Job Title:** Assembler
+- **Gender:** Male
+- **Marital Status:** Married
+- **Date of Birth:** (Redacted for privacy)
+- **SSN:** (Redacted for privacy)
+- **PEO Start Date:** 2018-04-25
+
+---
+
+### Compensation Details
+- **Pay Group:** LAKE-Weekly
+- **Pay Type:** Hourly
+- **Hourly Rate:** $12.00
+- **Standard Hours:** 40 per week
+- **Annualized Pay:** $24,960.00 (based on standard hours and hourly rate)
+- **Pay Periods:**
+  - Weekly: $480.00
+  - Biweekly: $960.00
+  - Semi-monthly: $1,040.00
+  - Monthly: $2,080.00
+  - Annual: $24,960.00
+- **Salary/Annual Pay:** Not specified (hourly employee)
+- **Pay Method:** Hourly (H)
+- **Filing Status (Federal):** Married
+- **Federal Allowances:** 1
+- **State Tax State:** OH (Ohio)
+- **State Allowances:** 1
+- **Last Pay Date (Paid Through):** 2025-08-08
+
+---
+
+### Status
+- **Employee Status:** Active (A)
+- **Employee Type:** Full-time (FT)
+- **Job Start Date:** 2018-04-25
+- **Seniority Date:** 2018-04-25
+- **Probation Date:** 2018-04-25
+- **FLSA Exempt:** No
+
+---
+
+### Benefits Summary
+- **Benefit Group:** 1
+- **Retirement Benefit Group:** 1
+- **Active Benefit Plans:** No current active benefit plans are listed for this employee in the HR system.
+
+---
+
+#### Additional Notes:
+- There are no currently listed benefit plans (medical, dental, vision, etc.) shown for Miguel Owen in the system. This may mean he is not enrolled or eligible, or there are no current elections in the system.
+- No compensation beyond hourly wage (such as bonuses or salary) is indicated.
+- No direct deposit or health savings account data is shown in the available extract.
+- If you require dependents, emergency contact, or detailed deductions, those can be retrieved with a follow-up request.
+
+---
+
+Would you like more specific information on dependents, deductions, or enrollment eligibility for Miguel Owen? If so, specify which area you want to explore further!
+
+================================================================================
+
+Query: quit
+
+Goodbye!
